@@ -7,7 +7,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/d5/tengo/v2"
+	"github.com/diiyw/z"
 )
 
 var textModule = map[string]z.Object{

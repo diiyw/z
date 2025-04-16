@@ -3,7 +3,7 @@ package z
 import (
 	"fmt"
 
-	"github.com/d5/tengo/v2/parser"
+	"github.com/diiyw/z/parser"
 )
 
 // MakeInstruction returns a bytecode for an opcode and the operands.

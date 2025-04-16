@@ -1,13 +1,13 @@
-# Tengo Language Syntax
+# Z Language Syntax
 
-Tengo's syntax is designed to be familiar to Go developers while being a bit
+Z's syntax is designed to be familiar to Go developers while being a bit
 simpler and more streamlined.
 
-**You can test the Tengo code in online [Playground](https://tengolang.com).**
+**You can test the Z code in online [Playground](https://zlang.com).**
 
 ## Values and Value Types
 
-In Tengo, everything is a value, and, all values are associated with a type.
+In Z, everything is a value, and, all values are associated with a type.
 
 ```golang
 19 + 84               // int values
@@ -20,9 +20,9 @@ true || false         // bool values
 func() { /*...*/ }    // function value
 ```
 
-Here's a list of all available value types in Tengo.
+Here's a list of all available value types in Z.
 
-| Tengo Type | Description | Equivalent Type in Go |
+| Z Type | Description | Equivalent Type in Go |
 | :---: | :---: | :---: |
 | int | signed 64-bit integer value | `int64` |
 | float | 64-bit floating point value | `float64` |
@@ -38,11 +38,11 @@ Here's a list of all available value types in Tengo.
 | immutable map | [immutable](#immutable-values) map | - |
 | undefined | [undefined](#undefined-values) value | - |
 | function | [function](#function-values) value | - |
-| _user-defined_ | value of [user-defined types](https://github.com/d5/tengo/blob/master/docs/objects.md) | - |
+| _user-defined_ | value of [user-defined types](https://github.com/d5/z/blob/master/docs/objects.md) | - |
 
 ### Error Values
 
-In Tengo, an error can be represented using "error" typed values. An error
+In Z, an error can be represented using "error" typed values. An error
 value is created using `error` expression, and, it must have an underlying
 value. The underlying value of an error value can be access using `.value`
 selector.
@@ -57,7 +57,7 @@ if is_error(err1) {      // 'is_error' builtin function
 
 ### Immutable Values
 
-In Tengo, basically all values (except for array and map) are immutable.
+In Z, basically all values (except for array and map) are immutable.
 
 ```golang
 s := "12345"
@@ -100,7 +100,7 @@ a.c[1] = 5     // illegal
 
 ### Undefined Values
 
-In Tengo, an "undefined" value can be used to represent an unexpected or
+In Z, an "undefined" value can be used to represent an unexpected or
 non-existing value:
 
 - A function that does not return a value explicitly considered to return
@@ -119,7 +119,7 @@ d := int("foo")             // d == undefined
 
 ### Array Values
 
-In Tengo, array is an ordered list of values of any types. Elements of an array
+In Z, array is an ordered list of values of any types. Elements of an array
 can be accessed using indexer `[]`.
 
 ```golang
@@ -132,7 +132,7 @@ can be accessed using indexer `[]`.
 
 ### Map Values
 
-In Tengo, map is a set of key-value pairs where key is string and the value is
+In Z, map is a set of key-value pairs where key is string and the value is
 of any value types. Value of a map can be accessed using indexer `[]` or
 selector '.' operators.
 
@@ -147,7 +147,7 @@ m.x                                   // == undefined
 
 ### Function Values
 
-In Tengo, function is a callable value with a number of function arguments and
+In Z, function is a callable value with a number of function arguments and
 a return value. Just like any other values, functions can be passed into or
 returned from another function.
 
@@ -163,7 +163,7 @@ add5 := adder(5)
 nine := add5(4)    // == 9
 ```
 
-Unlike Go, Tengo does not have declarations. So the following code is illegal:
+Unlike Go, Z does not have declarations. So the following code is illegal:
 
 ```golang
 func my_func(arg1, arg2) {  // illegal
@@ -171,7 +171,7 @@ func my_func(arg1, arg2) {  // illegal
 }
 ```
 
-Tengo also supports variadic functions/closures:
+Z also supports variadic functions/closures:
 
 ```golang
 variadic := func (a, b, ...c) {
@@ -267,9 +267,9 @@ a = [1, 2, 3]   // re-assigned 'array'
 
 ## Type Conversions
 
-Although the type is not directly specified in Tengo, one can use type
+Although the type is not directly specified in Z, one can use type
 conversion
-[builtin functions](https://github.com/d5/tengo/blob/master/docs/builtins.md)
+[builtin functions](https://github.com/d5/z/blob/master/docs/builtins.md)
 to convert between value types.
 
 ```golang
@@ -280,7 +280,7 @@ b4 := bool(1)         // true
 c5 := char("X")       // 'X'
 ```
 
-See [Operators](https://github.com/d5/tengo/blob/master/docs/operators.md)
+See [Operators](https://github.com/d5/z/blob/master/docs/operators.md)
 for more details on type coercions.
 
 ## Operators
@@ -294,8 +294,8 @@ for more details on type coercions.
 | `!`   | logical NOT | all types* |
 | `^`   | bitwise complement | int |
 
-_In Tengo, all values can be either
-[truthy or falsy](https://github.com/d5/tengo/blob/d5-patch-1/docs/runtime-types.md#objectisfalsy)._
+_In Z, all values can be either
+[truthy or falsy](https://github.com/d5/z/blob/d5-patch-1/docs/runtime-types.md#objectisfalsy)._
 
 ### Binary Operators
 
@@ -320,12 +320,12 @@ _In Tengo, all values can be either
 | `>`   | greater than | int, float, char, time, string |
 | `>=`   | greater than or equal to | int, float, char, time, string |
 
-_See [Operators](https://github.com/d5/tengo/blob/master/docs/operators.md)
+_See [Operators](https://github.com/d5/z/blob/master/docs/operators.md)
 for more details._
 
 ### Ternary Operators
 
-Tengo has a ternary conditional operator `(condition expression) ? (true expression) : (false expression)`.
+Z has a ternary conditional operator `(condition expression) ? (true expression) : (false expression)`.
 
 ```golang
 a := true ? 1 : -1    // a == 1
@@ -468,7 +468,7 @@ for {
 
 ### For-In Statement
 
-"For-In" statement is new in Tengo. It's similar to Go's `for range` statement.
+"For-In" statement is new in Z. It's similar to Go's `for range` statement.
 "For-In" statement can iterate any iterable value types (array, map, bytes,
 string, undefined).
 
@@ -488,7 +488,7 @@ for k, v in {k1: 1, k2: 2} {  // map: key and value
 
 ## Modules
 
-Module is the basic compilation unit in Tengo. A module can import another
+Module is the basic compilation unit in Z. A module can import another
 module using `import` expression.
 
 Main module:
@@ -498,7 +498,7 @@ sum := import("./sum")  // load module from a local file
 fmt.print(sum(10))      // module function
 ```
 
-Another module in `sum.tengo` file:
+Another module in `sum.z` file:
 
 ```golang
 base := 5
@@ -509,16 +509,16 @@ export func(x) {
 ```
 
 By default, `import` solves the missing extension name of a module file as
-"`.tengo`"[^note].
-Thus, `sum := import("./sum")` is equivalent to `sum := import("./sum.tengo")`.
+"`.z`"[^note].
+Thus, `sum := import("./sum")` is equivalent to `sum := import("./sum.z")`.
 
 [^note]:
-    If using Tengo as a library in Go, the file extension name "`.tengo`" can
+    If using Z as a library in Go, the file extension name "`.z`" can
     be customized. In that case, use the `SetImportFileExt` function of the
     `Compiler` type.
-    See the [Go reference](https://pkg.go.dev/github.com/d5/tengo/v2) for details.
+    See the [Go reference](https://pkg.go.dev/github.com/diiyw/z) for details.
 
-In Tengo, modules are very similar to functions.
+In Z, modules are very similar to functions.
 
 - `import` expression loads the module code and execute it like a function.
 - Module should return a value using `export` statement.
@@ -532,7 +532,7 @@ In Tengo, modules are very similar to functions.
   the code is executed as a main module.
 
 Also, you can use `import` expression to load the
-[Standard Library](https://github.com/d5/tengo/blob/master/docs/stdlib.md) as
+[Standard Library](https://github.com/d5/z/blob/master/docs/stdlib.md) as
 well.
 
 ```golang
@@ -542,7 +542,7 @@ a := math.abs(-19.84)  // == 19.84
 
 ## Comments
 
-Like Go, Tengo supports line comments (`//...`) and block comments
+Like Go, Z supports line comments (`//...`) and block comments
 (`/* ... */`).
 
 ```golang
@@ -555,7 +555,7 @@ a := 5    // line comments
 
 ## Differences from Go
 
-Unlike Go, Tengo does not have the following:
+Unlike Go, Z does not have the following:
 
 - Declarations
 - Imaginary values

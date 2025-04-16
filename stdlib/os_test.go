@@ -5,8 +5,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/d5/tengo/v2"
-	"github.com/d5/tengo/v2/require"
+	"github.com/diiyw/z"
+	"github.com/diiyw/z/require"
 )
 
 func TestReadFile(t *testing.T) {
@@ -81,28 +81,28 @@ func TestOSExpandEnv(t *testing.T) {
 	defer func() { z.MaxStringLen = curMaxStringLen }()
 	z.MaxStringLen = 12
 
-	_ = os.Setenv("TENGO", "FOO BAR")
-	module(t, "os").call("expand_env", "$TENGO").expect("FOO BAR")
+	_ = os.Setenv("Z", "FOO BAR")
+	module(t, "os").call("expand_env", "$Z").expect("FOO BAR")
 
-	_ = os.Setenv("TENGO", "FOO")
-	module(t, "os").call("expand_env", "$TENGO $TENGO").expect("FOO FOO")
+	_ = os.Setenv("Z", "FOO")
+	module(t, "os").call("expand_env", "$Z $Z").expect("FOO FOO")
 
-	_ = os.Setenv("TENGO", "123456789012")
-	module(t, "os").call("expand_env", "$TENGO").expect("123456789012")
+	_ = os.Setenv("Z", "123456789012")
+	module(t, "os").call("expand_env", "$Z").expect("123456789012")
 
-	_ = os.Setenv("TENGO", "1234567890123")
-	module(t, "os").call("expand_env", "$TENGO").expectError()
+	_ = os.Setenv("Z", "1234567890123")
+	module(t, "os").call("expand_env", "$Z").expectError()
 
-	_ = os.Setenv("TENGO", "123456")
-	module(t, "os").call("expand_env", "$TENGO$TENGO").expect("123456123456")
+	_ = os.Setenv("Z", "123456")
+	module(t, "os").call("expand_env", "$Z$Z").expect("123456123456")
 
-	_ = os.Setenv("TENGO", "123456")
-	module(t, "os").call("expand_env", "${TENGO}${TENGO}").
+	_ = os.Setenv("Z", "123456")
+	module(t, "os").call("expand_env", "${Z}${Z}").
 		expect("123456123456")
 
-	_ = os.Setenv("TENGO", "123456")
-	module(t, "os").call("expand_env", "$TENGO $TENGO").expectError()
+	_ = os.Setenv("Z", "123456")
+	module(t, "os").call("expand_env", "$Z $Z").expectError()
 
-	_ = os.Setenv("TENGO", "123456")
-	module(t, "os").call("expand_env", "${TENGO} ${TENGO}").expectError()
+	_ = os.Setenv("Z", "123456")
+	module(t, "os").call("expand_env", "${Z} ${Z}").expectError()
 }

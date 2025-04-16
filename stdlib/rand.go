@@ -3,7 +3,7 @@ package stdlib
 import (
 	"math/rand"
 
-	"github.com/d5/tengo/v2"
+	"github.com/diiyw/z"
 )
 
 var randModule = map[string]z.Object{

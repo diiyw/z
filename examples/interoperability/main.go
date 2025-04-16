@@ -1,4 +1,4 @@
-/*An example to demonstrate an alternative way to run tengo functions from go.
+/*An example to demonstrate an alternative way to run z functions from go.
  */
 package main
 
@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/d5/tengo/v2"
+	"github.com/diiyw/z"
 )
 
 // CallArgs holds function name to be executed and its required parameters with
@@ -37,7 +37,7 @@ func NewGoProxy(ctx context.Context) *GoProxy {
 	return mod
 }
 
-// GoProxy is a builtin tengo module to register tengo functions and run them.
+// GoProxy is a builtin z module to register z functions and run them.
 type GoProxy struct {
 	z.ObjectImpl
 	ctx       context.Context
@@ -58,12 +58,12 @@ func (mod *GoProxy) String() string {
 	return m.String()
 }
 
-// ModuleMap returns a map to add a builtin tengo module.
+// ModuleMap returns a map to add a builtin z module.
 func (mod *GoProxy) ModuleMap() map[string]z.Object {
 	return mod.moduleMap
 }
 
-// CallChan returns call channel which expects arguments to run a tengo
+// CallChan returns call channel which expects arguments to run a z
 // function.
 func (mod *GoProxy) CallChan() chan<- *CallArgs {
 	return mod.callChan
@@ -152,8 +152,8 @@ func (mod *GoProxy) args(args ...z.Object) (z.Object, error) {
 	}, nil
 }
 
-// ProxySource is a tengo script to handle bidirectional arguments flow between
-// go and pure tengo functions. Note: you should add more if conditions for
+// ProxySource is a z script to handle bidirectional arguments flow between
+// go and pure z functions. Note: you should add more if conditions for
 // different number of parameters.
 // TODO: handle variadic functions.
 var ProxySource = `
@@ -228,11 +228,11 @@ func main() {
 		panic(err)
 	}
 
-	// call "sum", "multiply", "increment" functions from tengo in a new goroutine
+	// call "sum", "multiply", "increment" functions from z in a new goroutine
 	go func() {
 		callChan := goproxy.CallChan()
 		result := make(chan z.Object, 1)
-		// TODO: check tengo error from result channel.
+		// TODO: check z error from result channel.
 	loop:
 		for {
 			select {
@@ -240,7 +240,7 @@ func main() {
 				break loop
 			default:
 			}
-			fmt.Println("Calling tengo sum function")
+			fmt.Println("Calling z sum function")
 			i1, i2 := rand.Int63n(100), rand.Int63n(100)
 			callChan <- &CallArgs{Func: "sum",
 				Params: []z.Object{&z.Int{Value: i1},
@@ -250,7 +250,7 @@ func main() {
 			v := <-result
 			fmt.Printf("%d + %d = %v\n", i1, i2, v)
 
-			fmt.Println("Calling tengo multiply function")
+			fmt.Println("Calling z multiply function")
 			i1, i2 = rand.Int63n(20), rand.Int63n(20)
 			callChan <- &CallArgs{Func: "multiply",
 				Params: []z.Object{&z.Int{Value: i1},
@@ -260,7 +260,7 @@ func main() {
 			v = <-result
 			fmt.Printf("%d * %d = %v\n", i1, i2, v)
 
-			fmt.Println("Calling tengo increment function")
+			fmt.Println("Calling z increment function")
 			callChan <- &CallArgs{Func: "increment", Result: result}
 			v = <-result
 			fmt.Printf("increment = %v\n", v)

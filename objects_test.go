@@ -3,9 +3,9 @@ package z_test
 import (
 	"testing"
 
-	"github.com/d5/tengo/v2"
-	"github.com/d5/tengo/v2/require"
-	"github.com/d5/tengo/v2/token"
+	"github.com/diiyw/z"
+	"github.com/diiyw/z/require"
+	"github.com/diiyw/z/token"
 )
 
 func TestObject_TypeName(t *testing.T) {

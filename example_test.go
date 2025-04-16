@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/d5/tengo/v2"
+	"github.com/diiyw/z"
 )
 
 func Example() {
-	// Tengo script code
+	// Z script code
 	src := `
 each := func(seq, fn) {
     for x in seq { fn(x) }

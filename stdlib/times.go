@@ -3,7 +3,7 @@ package stdlib
 import (
 	"time"
 
-	"github.com/d5/tengo/v2"
+	"github.com/diiyw/z"
 )
 
 var timesModule = map[string]z.Object{

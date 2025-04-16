@@ -2,15 +2,15 @@
 
 ## Table of Contents
 
-- [Tengo Objects](#tengo-objects)
+- [Z Objects](#z-objects)
 - [Runtime Object Types](#runtime-object-types)
 - [User Object Types](#user-object-types)
 
-## Tengo Objects
+## Z Objects
 
-In Tengo, all object types _(both [runtime types](#runtime-object-types) and
+In Z, all object types _(both [runtime types](#runtime-object-types) and
 [user types](#user-object-types))_ must implement
-[Object](https://godoc.org/github.com/d5/tengo#Object) interface.
+[Object](https://godoc.org/github.com/d5/z#Object) interface.
 
 ### Object Interface
 
@@ -34,7 +34,7 @@ the value is required, most commonly when being converted into String value.
 BinaryOp(op token.Token, rhs Object) (res Object, err error)
 ```
 
-In Tengo, a type can overload binary operators
+In Z, a type can overload binary operators
 (`+`, `-`, `*`, `/`, `%`, `&`, `|`, `^`, `&^`, `>>`, `<<`, `>`, `>=`; _note
 that `<` and `<=` operators are not overloadable as they're simply implemented
 by switching left-hand side and right-hand side of `>`/`>=` operator_) by
@@ -60,7 +60,7 @@ IsFalsy() bool
 ```
 
 IsFalsy method should return true if the underlying value is considered to be
-[falsy](https://github.com/d5/tengo/blob/master/docs/runtime-types.md#objectisfalsy).
+[falsy](https://github.com/d5/z/blob/master/docs/runtime-types.md#objectisfalsy).
 
 ```golang
 Equals(o Object) bool
@@ -157,7 +157,7 @@ Iterate() Iterator
 ```
 
 The Iterate method should return another object that implements
-[Iterator](https://godoc.org/github.com/d5/tengo#Iterator) interface.
+[Iterator](https://godoc.org/github.com/d5/z#Iterator) interface.
 
 ### Iterator Interface
 
@@ -191,50 +191,50 @@ again.
 
 ## Runtime Object Types
 
-These are the basic types Tengo runtime supports out of the box:
+These are the basic types Z runtime supports out of the box:
 
-- Primitive value types: [Int](https://godoc.org/github.com/d5/tengo#Int),
-  [String](https://godoc.org/github.com/d5/tengo#String),
-  [Float](https://godoc.org/github.com/d5/tengo#Float),
-  [Bool](https://godoc.org/github.com/d5/tengo#ArrayIterator),
-  [Char](https://godoc.org/github.com/d5/tengo#Char),
-  [Bytes](https://godoc.org/github.com/d5/tengo#Bytes),
-  [Time](https://godoc.org/github.com/d5/tengo#Time)
-- Composite value types: [Array](https://godoc.org/github.com/d5/tengo#Array),
-  [ImmutableArray](https://godoc.org/github.com/d5/tengo#ImmutableArray),
-  [Map](https://godoc.org/github.com/d5/tengo#Map),
-  [ImmutableMap](https://godoc.org/github.com/d5/tengo#ImmutableMap)
+- Primitive value types: [Int](https://godoc.org/github.com/d5/z#Int),
+  [String](https://godoc.org/github.com/d5/z#String),
+  [Float](https://godoc.org/github.com/d5/z#Float),
+  [Bool](https://godoc.org/github.com/d5/z#ArrayIterator),
+  [Char](https://godoc.org/github.com/d5/z#Char),
+  [Bytes](https://godoc.org/github.com/d5/z#Bytes),
+  [Time](https://godoc.org/github.com/d5/z#Time)
+- Composite value types: [Array](https://godoc.org/github.com/d5/z#Array),
+  [ImmutableArray](https://godoc.org/github.com/d5/z#ImmutableArray),
+  [Map](https://godoc.org/github.com/d5/z#Map),
+  [ImmutableMap](https://godoc.org/github.com/d5/z#ImmutableMap)
 - Functions:
-  [CompiledFunction](https://godoc.org/github.com/d5/tengo#CompiledFunction),
-  [BuiltinFunction](https://godoc.org/github.com/d5/tengo#BuiltinFunction),
-  [UserFunction](https://godoc.org/github.com/d5/tengo#UserFunction)
-- [Iterators](https://godoc.org/github.com/d5/tengo#Iterator):
-  [StringIterator](https://godoc.org/github.com/d5/tengo#StringIterator),
-  [ArrayIterator](https://godoc.org/github.com/d5/tengo#ArrayIterator),
-  [MapIterator](https://godoc.org/github.com/d5/tengo#MapIterator),
-  [ImmutableMapIterator](https://godoc.org/github.com/d5/tengo#ImmutableMapIterator)
-- [Error](https://godoc.org/github.com/d5/tengo#Error)
-- [Undefined](https://godoc.org/github.com/d5/tengo#Undefined)
-- Other internal objects: [Break](https://godoc.org/github.com/d5/tengo#Break),
-  [Continue](https://godoc.org/github.com/d5/tengo#Continue),
-  [ReturnValue](https://godoc.org/github.com/d5/tengo#ReturnValue)
+  [CompiledFunction](https://godoc.org/github.com/d5/z#CompiledFunction),
+  [BuiltinFunction](https://godoc.org/github.com/d5/z#BuiltinFunction),
+  [UserFunction](https://godoc.org/github.com/d5/z#UserFunction)
+- [Iterators](https://godoc.org/github.com/d5/z#Iterator):
+  [StringIterator](https://godoc.org/github.com/d5/z#StringIterator),
+  [ArrayIterator](https://godoc.org/github.com/d5/z#ArrayIterator),
+  [MapIterator](https://godoc.org/github.com/d5/z#MapIterator),
+  [ImmutableMapIterator](https://godoc.org/github.com/d5/z#ImmutableMapIterator)
+- [Error](https://godoc.org/github.com/d5/z#Error)
+- [Undefined](https://godoc.org/github.com/d5/z#Undefined)
+- Other internal objects: [Break](https://godoc.org/github.com/d5/z#Break),
+  [Continue](https://godoc.org/github.com/d5/z#Continue),
+  [ReturnValue](https://godoc.org/github.com/d5/z#ReturnValue)
 
 See
-[Runtime Types](https://github.com/d5/tengo/blob/master/docs/runtime-types.md)
+[Runtime Types](https://github.com/d5/z/blob/master/docs/runtime-types.md)
 for more details on these runtime types.
 
 ## User Object Types
 
 Users can easily extend and add their own types by implementing the same
-[Object](https://godoc.org/github.com/d5/tengo#Object) interface and the
-default `ObjectImpl` implementation. Tengo runtime will treat them in the
+[Object](https://godoc.org/github.com/d5/z#Object) interface and the
+default `ObjectImpl` implementation. Z runtime will treat them in the
 same way as its runtime types with no performance overhead.
 
 Here's an example user type implementation, `StringArray`:
 
 ```golang
 type StringArray struct {
-    tengo.ObjectImpl
+    z.ObjectImpl
     Value []string
 }
 
@@ -242,7 +242,7 @@ func (o *StringArray) String() string {
     return strings.Join(o.Value, ", ")
 }
 
-func (o *StringArray) BinaryOp(op token.Token, rhs tengo.Object) (tengo.Object, error) {
+func (o *StringArray) BinaryOp(op token.Token, rhs z.Object) (z.Object, error) {
     if rhs, ok := rhs.(*StringArray); ok {
         switch op {
         case token.Add:
@@ -253,14 +253,14 @@ func (o *StringArray) BinaryOp(op token.Token, rhs tengo.Object) (tengo.Object, 
         }
     }
 
-    return nil, tengo.ErrInvalidOperator
+    return nil, z.ErrInvalidOperator
 }
 
 func (o *StringArray) IsFalsy() bool {
     return len(o.Value) == 0
 }
 
-func (o *StringArray) Equals(x tengo.Object) bool {
+func (o *StringArray) Equals(x z.Object) bool {
     if x, ok := x.(*StringArray); ok {
         if len(o.Value) != len(x.Value) {
             return false
@@ -278,7 +278,7 @@ func (o *StringArray) Equals(x tengo.Object) bool {
     return false
 }
 
-func (o *StringArray) Copy() tengo.Object {
+func (o *StringArray) Copy() z.Object {
     return &StringArray{
         Value: append([]string{}, o.Value...),
     }
@@ -290,13 +290,13 @@ func (o *StringArray) TypeName() string {
 ```
 
 You can use a user type via either
-[Script.Add](https://godoc.org/github.com/d5/tengo#Script.Add) or by directly
+[Script.Add](https://godoc.org/github.com/d5/z#Script.Add) or by directly
 manipulating the symbol table and the global variables. Here's an example code
 to add `StringArray` to the script:
 
 ```golang
 // script that uses 'my_list'
-s := tengo.NewScript([]byte(`
+s := z.NewScript([]byte(`
     fmt := import("fmt")
     fmt.println(my_list, ", three")
 `))
@@ -310,47 +310,47 @@ s.Run()                   // prints "one, two, three"
 It can also implement `IndexGet` and `IndexSet`:
 
 ```golang
-func (o *StringArray) IndexGet(index tengo.Object) (tengo.Object, error) {
-    intIdx, ok := index.(*tengo.Int)
+func (o *StringArray) IndexGet(index z.Object) (z.Object, error) {
+    intIdx, ok := index.(*z.Int)
     if ok {
         if intIdx.Value >= 0 && intIdx.Value < int64(len(o.Value)) {
-            return &tengo.String{Value: o.Value[intIdx.Value]}, nil
+            return &z.String{Value: o.Value[intIdx.Value]}, nil
         }
 
-        return nil, tengo.ErrIndexOutOfBounds
+        return nil, z.ErrIndexOutOfBounds
     }
 
-    strIdx, ok := index.(*tengo.String)
+    strIdx, ok := index.(*z.String)
     if ok {
         for vidx, str := range o.Value {
             if strIdx.Value == str {
-                return &tengo.Int{Value: int64(vidx)}, nil
+                return &z.Int{Value: int64(vidx)}, nil
             }
         }
 
-        return tengo.UndefinedValue, nil
+        return z.UndefinedValue, nil
     }
 
-    return nil, tengo.ErrInvalidIndexType
+    return nil, z.ErrInvalidIndexType
 }
 
-func (o *StringArray) IndexSet(index, value tengo.Object) error {
-    strVal, ok := tengo.ToString(value)
+func (o *StringArray) IndexSet(index, value z.Object) error {
+    strVal, ok := z.ToString(value)
     if !ok {
-        return tengo.ErrInvalidIndexValueType
+        return z.ErrInvalidIndexValueType
     }
 
-    intIdx, ok := index.(*tengo.Int)
+    intIdx, ok := index.(*z.Int)
     if ok {
         if intIdx.Value >= 0 && intIdx.Value < int64(len(o.Value)) {
             o.Value[intIdx.Value] = strVal
             return nil
         }
 
-        return tengo.ErrIndexOutOfBounds
+        return z.ErrIndexOutOfBounds
     }
 
-    return tengo.ErrInvalidIndexType
+    return z.ErrInvalidIndexType
 }
 ```
 
@@ -361,14 +361,14 @@ func (o *StringArray) CanCall() bool {
     return true
 }
 
-func (o *StringArray) Call(args ...tengo.Object) (ret tengo.Object, err error) {
+func (o *StringArray) Call(args ...z.Object) (ret z.Object, err error) {
     if len(args) != 1 {
-        return nil, tengo.ErrWrongNumArguments
+        return nil, z.ErrWrongNumArguments
     }
 
-    s1, ok := tengo.ToString(args[0])
+    s1, ok := z.ToString(args[0])
     if !ok {
-        return nil, tengo.ErrInvalidArgumentType{
+        return nil, z.ErrInvalidArgumentType{
             Name:     "first",
             Expected: "string",
             Found:    args[0].TypeName(),
@@ -377,18 +377,18 @@ func (o *StringArray) Call(args ...tengo.Object) (ret tengo.Object, err error) {
 
     for i, v := range o.Value {
         if v == s1 {
-            return &tengo.Int{Value: int64(i)}, nil
+            return &z.Int{Value: int64(i)}, nil
         }
     }
 
-    return tengo.UndefinedValue, nil
+    return z.UndefinedValue, nil
 }
 ```
 
 Then it can be "invoked":
 
 ```golang
-s := tengo.NewScript([]byte(`
+s := z.NewScript([]byte(`
     print(my_list("two"))
 `))
 
@@ -404,14 +404,14 @@ func (o *StringArray) CanIterate() bool {
     return true
 }
 
-func (o *StringArray) Iterate() tengo.Iterator {
+func (o *StringArray) Iterate() z.Iterator {
     return &StringArrayIterator{
         strArr: o,
     }
 }
 
 type StringArrayIterator struct {
-    tengo.ObjectImpl
+    z.ObjectImpl
     strArr *StringArray
     idx    int
 }
@@ -425,12 +425,12 @@ func (i *StringArrayIterator) Next() bool {
     return i.idx <= len(i.strArr.Value)
 }
 
-func (i *StringArrayIterator) Key() tengo.Object {
-    return &tengo.Int{Value: int64(i.idx - 1)}
+func (i *StringArrayIterator) Key() z.Object {
+    return &z.Int{Value: int64(i.idx - 1)}
 }
 
-func (i *StringArrayIterator) Value() tengo.Object {
-    return &tengo.String{Value: i.strArr.Value[i.idx-1]}
+func (i *StringArrayIterator) Value() z.Object {
+    return &z.String{Value: i.strArr.Value[i.idx-1]}
 }
 ```
 

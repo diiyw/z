@@ -1,3 +1,4 @@
+//go:build ignore
 // +build ignore
 
 package main
@@ -10,18 +11,18 @@ import (
 	"strconv"
 )
 
-var tengoModFileRE = regexp.MustCompile(`^srcmod_(\w+).tengo$`)
+var zModFileRE = regexp.MustCompile(`^srcmod_(\w+).z$`)
 
 func main() {
 	modules := make(map[string]string)
 
-	// enumerate all Tengo module files
+	// enumerate all Z module files
 	files, err := ioutil.ReadDir(".")
 	if err != nil {
 		log.Fatal(err)
 	}
 	for _, file := range files {
-		m := tengoModFileRE.FindStringSubmatch(file.Name())
+		m := zModFileRE.FindStringSubmatch(file.Name())
 		if m != nil {
 			modName := m[1]
 

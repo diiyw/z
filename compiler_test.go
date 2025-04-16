@@ -7,10 +7,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/d5/tengo/v2"
-	"github.com/d5/tengo/v2/parser"
-	"github.com/d5/tengo/v2/require"
-	"github.com/d5/tengo/v2/stdlib"
+	"github.com/diiyw/z"
+	"github.com/diiyw/z/parser"
+	"github.com/diiyw/z/require"
+	"github.com/diiyw/z/stdlib"
 )
 
 func TestCompiler_Compile(t *testing.T) {
@@ -1009,7 +1009,7 @@ r["x"] = {
 
 	expectCompileError(t, `import("")`, "empty module name")
 
-	// https://github.com/d5/tengo/issues/314
+	// https://github.com/d5/z/issues/314
 	expectCompileError(t, `
 (func() {
 	fn := fn()
@@ -1275,8 +1275,8 @@ func TestCompiler_custom_extension(t *testing.T) {
 	c.EnableFileImport(true)
 	c.SetImportDir(filepath.Dir(pathFileSource))
 
-	// Search for "*.tengo" and ".mshk"(custom extension)
-	c.SetImportFileExt(".tengo", ".mshk")
+	// Search for "*.z" and ".mshk"(custom extension)
+	c.SetImportFileExt(".z", ".mshk")
 
 	err = c.Compile(file)
 	require.NoError(t, err)
@@ -1291,7 +1291,7 @@ func TestCompilerNewCompiler_default_file_extension(t *testing.T) {
 	c := z.NewCompiler(file, nil, nil, modules, nil)
 	c.EnableFileImport(true)
 
-	require.Equal(t, []string{".tengo"}, c.GetImportFileExt(),
+	require.Equal(t, []string{".z"}, c.GetImportFileExt(),
 		"newly created compiler object must contain the default extension")
 }
 
@@ -1310,15 +1310,15 @@ func TestCompilerSetImportExt_extension_name_validation(t *testing.T) {
 		requireErr bool
 		msgFail    string
 	}{
-		{[]string{".tengo"}, []string{".tengo"}, false,
+		{[]string{".z"}, []string{".z"}, false,
 			"well-formed extension should not return an error"},
-		{[]string{""}, []string{".tengo"}, true,
+		{[]string{""}, []string{".z"}, true,
 			"empty extension name should return an error"},
-		{[]string{"foo"}, []string{".tengo"}, true,
+		{[]string{"foo"}, []string{".z"}, true,
 			"name without dot prefix should return an error"},
-		{[]string{"foo.bar"}, []string{".tengo"}, true,
+		{[]string{"foo.bar"}, []string{".z"}, true,
 			"malformed extension should return an error"},
-		{[]string{"foo."}, []string{".tengo"}, true,
+		{[]string{"foo."}, []string{".z"}, true,
 			"malformed extension should return an error"},
 		{[]string{".mshk"}, []string{".mshk"}, false,
 			"name with dot prefix should be added"},

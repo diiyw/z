@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/d5/tengo/v2"
-	"github.com/d5/tengo/v2/require"
-	"github.com/d5/tengo/v2/stdlib"
-	"github.com/d5/tengo/v2/token"
+	"github.com/diiyw/z"
+	"github.com/diiyw/z/require"
+	"github.com/diiyw/z/stdlib"
+	"github.com/diiyw/z/token"
 )
 
 func TestScript_Add(t *testing.T) {
@@ -490,7 +490,7 @@ func TestCompiled_CustomObject(t *testing.T) {
 	compiledGet(t, c, "r", true)
 }
 
-// customNumber is a user defined object that can compare to tengo.Int
+// customNumber is a user defined object that can compare to z.Int
 // very shitty implementation, just to test that token.Less and token.Greater in BinaryOp works
 type customNumber struct {
 	z.ObjectImpl
@@ -506,11 +506,11 @@ func (n *customNumber) String() string {
 }
 
 func (n *customNumber) BinaryOp(op token.Token, rhs z.Object) (z.Object, error) {
-	tengoInt, ok := rhs.(*z.Int)
+	zInt, ok := rhs.(*z.Int)
 	if !ok {
 		return nil, z.ErrInvalidOperator
 	}
-	return n.binaryOpInt(op, tengoInt)
+	return n.binaryOpInt(op, zInt)
 }
 
 func (n *customNumber) binaryOpInt(op token.Token, rhs *z.Int) (z.Object, error) {

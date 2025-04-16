@@ -1,3 +1,3 @@
-module github.com/d5/tengo/v2
+module github.com/diiyw/z
 
 go 1.24

@@ -11,13 +11,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/d5/tengo/v2"
-	"github.com/d5/tengo/v2/parser"
-	"github.com/d5/tengo/v2/stdlib"
+	"github.com/diiyw/z"
+	"github.com/diiyw/z/parser"
+	"github.com/diiyw/z/stdlib"
 )
 
 const (
-	sourceFileExt = ".tengo"
+	sourceFileExt = ".z"
 	replPrompt    = ">> "
 )
 
@@ -254,7 +254,7 @@ func compileSrc(
 func doHelp() {
 	fmt.Println("Usage:")
 	fmt.Println()
-	fmt.Println("	tengo [flags] {input-file}")
+	fmt.Println("	z [flags] {input-file}")
 	fmt.Println()
 	fmt.Println("Flags:")
 	fmt.Println()
@@ -263,20 +263,20 @@ func doHelp() {
 	fmt.Println()
 	fmt.Println("Examples:")
 	fmt.Println()
-	fmt.Println("	tengo")
+	fmt.Println("	z")
 	fmt.Println()
-	fmt.Println("	          Start Tengo REPL")
+	fmt.Println("	          Start Z REPL")
 	fmt.Println()
-	fmt.Println("	tengo myapp.tengo")
+	fmt.Println("	z myapp.z")
 	fmt.Println()
-	fmt.Println("	          Compile and run source file (myapp.tengo)")
-	fmt.Println("	          Source file must have .tengo extension")
+	fmt.Println("	          Compile and run source file (myapp.z)")
+	fmt.Println("	          Source file must have .z extension")
 	fmt.Println()
-	fmt.Println("	tengo -o myapp myapp.tengo")
+	fmt.Println("	z -o myapp myapp.z")
 	fmt.Println()
-	fmt.Println("	          Compile source file (myapp.tengo) into bytecode file (myapp)")
+	fmt.Println("	          Compile source file (myapp.z) into bytecode file (myapp)")
 	fmt.Println()
-	fmt.Println("	tengo myapp")
+	fmt.Println("	z myapp")
 	fmt.Println()
 	fmt.Println("	          Run bytecode file (myapp)")
 	fmt.Println()
