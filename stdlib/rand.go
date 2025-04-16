@@ -6,44 +6,44 @@ import (
 	"github.com/d5/tengo/v2"
 )
 
-var randModule = map[string]tengo.Object{
-	"int": &tengo.UserFunction{
+var randModule = map[string]z.Object{
+	"int": &z.UserFunction{
 		Name:  "int",
 		Value: FuncARI64(rand.Int63),
 	},
-	"float": &tengo.UserFunction{
+	"float": &z.UserFunction{
 		Name:  "float",
 		Value: FuncARF(rand.Float64),
 	},
-	"intn": &tengo.UserFunction{
+	"intn": &z.UserFunction{
 		Name:  "intn",
 		Value: FuncAI64RI64(rand.Int63n),
 	},
-	"exp_float": &tengo.UserFunction{
+	"exp_float": &z.UserFunction{
 		Name:  "exp_float",
 		Value: FuncARF(rand.ExpFloat64),
 	},
-	"norm_float": &tengo.UserFunction{
+	"norm_float": &z.UserFunction{
 		Name:  "norm_float",
 		Value: FuncARF(rand.NormFloat64),
 	},
-	"perm": &tengo.UserFunction{
+	"perm": &z.UserFunction{
 		Name:  "perm",
 		Value: FuncAIRIs(rand.Perm),
 	},
-	"seed": &tengo.UserFunction{
+	"seed": &z.UserFunction{
 		Name:  "seed",
 		Value: FuncAI64R(rand.Seed),
 	},
-	"read": &tengo.UserFunction{
+	"read": &z.UserFunction{
 		Name: "read",
-		Value: func(args ...tengo.Object) (ret tengo.Object, err error) {
+		Value: func(args ...z.Object) (ret z.Object, err error) {
 			if len(args) != 1 {
-				return nil, tengo.ErrWrongNumArguments
+				return nil, z.ErrWrongNumArguments
 			}
-			y1, ok := args[0].(*tengo.Bytes)
+			y1, ok := args[0].(*z.Bytes)
 			if !ok {
-				return nil, tengo.ErrInvalidArgumentType{
+				return nil, z.ErrInvalidArgumentType{
 					Name:     "first",
 					Expected: "bytes",
 					Found:    args[0].TypeName(),
@@ -54,18 +54,18 @@ var randModule = map[string]tengo.Object{
 				ret = wrapError(err)
 				return
 			}
-			return &tengo.Int{Value: int64(res)}, nil
+			return &z.Int{Value: int64(res)}, nil
 		},
 	},
-	"rand": &tengo.UserFunction{
+	"rand": &z.UserFunction{
 		Name: "rand",
-		Value: func(args ...tengo.Object) (tengo.Object, error) {
+		Value: func(args ...z.Object) (z.Object, error) {
 			if len(args) != 1 {
-				return nil, tengo.ErrWrongNumArguments
+				return nil, z.ErrWrongNumArguments
 			}
-			i1, ok := tengo.ToInt64(args[0])
+			i1, ok := z.ToInt64(args[0])
 			if !ok {
-				return nil, tengo.ErrInvalidArgumentType{
+				return nil, z.ErrInvalidArgumentType{
 					Name:     "first",
 					Expected: "int(compatible)",
 					Found:    args[0].TypeName(),
@@ -77,49 +77,49 @@ var randModule = map[string]tengo.Object{
 	},
 }
 
-func randRand(r *rand.Rand) *tengo.ImmutableMap {
-	return &tengo.ImmutableMap{
-		Value: map[string]tengo.Object{
-			"int": &tengo.UserFunction{
+func randRand(r *rand.Rand) *z.ImmutableMap {
+	return &z.ImmutableMap{
+		Value: map[string]z.Object{
+			"int": &z.UserFunction{
 				Name:  "int",
 				Value: FuncARI64(r.Int63),
 			},
-			"float": &tengo.UserFunction{
+			"float": &z.UserFunction{
 				Name:  "float",
 				Value: FuncARF(r.Float64),
 			},
-			"intn": &tengo.UserFunction{
+			"intn": &z.UserFunction{
 				Name:  "intn",
 				Value: FuncAI64RI64(r.Int63n),
 			},
-			"exp_float": &tengo.UserFunction{
+			"exp_float": &z.UserFunction{
 				Name:  "exp_float",
 				Value: FuncARF(r.ExpFloat64),
 			},
-			"norm_float": &tengo.UserFunction{
+			"norm_float": &z.UserFunction{
 				Name:  "norm_float",
 				Value: FuncARF(r.NormFloat64),
 			},
-			"perm": &tengo.UserFunction{
+			"perm": &z.UserFunction{
 				Name:  "perm",
 				Value: FuncAIRIs(r.Perm),
 			},
-			"seed": &tengo.UserFunction{
+			"seed": &z.UserFunction{
 				Name:  "seed",
 				Value: FuncAI64R(r.Seed),
 			},
-			"read": &tengo.UserFunction{
+			"read": &z.UserFunction{
 				Name: "read",
-				Value: func(args ...tengo.Object) (
-					ret tengo.Object,
+				Value: func(args ...z.Object) (
+					ret z.Object,
 					err error,
 				) {
 					if len(args) != 1 {
-						return nil, tengo.ErrWrongNumArguments
+						return nil, z.ErrWrongNumArguments
 					}
-					y1, ok := args[0].(*tengo.Bytes)
+					y1, ok := args[0].(*z.Bytes)
 					if !ok {
-						return nil, tengo.ErrInvalidArgumentType{
+						return nil, z.ErrInvalidArgumentType{
 							Name:     "first",
 							Expected: "bytes",
 							Found:    args[0].TypeName(),
@@ -130,7 +130,7 @@ func randRand(r *rand.Rand) *tengo.ImmutableMap {
 						ret = wrapError(err)
 						return
 					}
-					return &tengo.Int{Value: int64(res)}, nil
+					return &z.Int{Value: int64(res)}, nil
 				},
 			},
 		},

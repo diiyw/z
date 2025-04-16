@@ -1,4 +1,4 @@
-package tengo_test
+package z_test
 
 import (
 	"strings"
@@ -13,9 +13,9 @@ import (
 func TestInstructions_String(t *testing.T) {
 	assertInstructionString(t,
 		[][]byte{
-			tengo.MakeInstruction(parser.OpConstant, 1),
-			tengo.MakeInstruction(parser.OpConstant, 2),
-			tengo.MakeInstruction(parser.OpConstant, 65535),
+			z.MakeInstruction(parser.OpConstant, 1),
+			z.MakeInstruction(parser.OpConstant, 2),
+			z.MakeInstruction(parser.OpConstant, 65535),
 		},
 		`0000 CONST   1    
 0003 CONST   2    
@@ -23,9 +23,9 @@ func TestInstructions_String(t *testing.T) {
 
 	assertInstructionString(t,
 		[][]byte{
-			tengo.MakeInstruction(parser.OpBinaryOp, 11),
-			tengo.MakeInstruction(parser.OpConstant, 2),
-			tengo.MakeInstruction(parser.OpConstant, 65535),
+			z.MakeInstruction(parser.OpBinaryOp, 11),
+			z.MakeInstruction(parser.OpConstant, 2),
+			z.MakeInstruction(parser.OpConstant, 65535),
 		},
 		`0000 BINARYOP 11   
 0002 CONST   2    
@@ -33,10 +33,10 @@ func TestInstructions_String(t *testing.T) {
 
 	assertInstructionString(t,
 		[][]byte{
-			tengo.MakeInstruction(parser.OpBinaryOp, 11),
-			tengo.MakeInstruction(parser.OpGetLocal, 1),
-			tengo.MakeInstruction(parser.OpConstant, 2),
-			tengo.MakeInstruction(parser.OpConstant, 65535),
+			z.MakeInstruction(parser.OpBinaryOp, 11),
+			z.MakeInstruction(parser.OpGetLocal, 1),
+			z.MakeInstruction(parser.OpConstant, 2),
+			z.MakeInstruction(parser.OpConstant, 65535),
 		},
 		`0000 BINARYOP 11   
 0002 GETL    1    
@@ -57,60 +57,60 @@ func TestMakeInstruction(t *testing.T) {
 }
 
 func TestNumObjects(t *testing.T) {
-	testCountObjects(t, &tengo.Array{}, 1)
-	testCountObjects(t, &tengo.Array{Value: []tengo.Object{
-		&tengo.Int{Value: 1},
-		&tengo.Int{Value: 2},
-		&tengo.Array{Value: []tengo.Object{
-			&tengo.Int{Value: 3},
-			&tengo.Int{Value: 4},
-			&tengo.Int{Value: 5},
+	testCountObjects(t, &z.Array{}, 1)
+	testCountObjects(t, &z.Array{Value: []z.Object{
+		&z.Int{Value: 1},
+		&z.Int{Value: 2},
+		&z.Array{Value: []z.Object{
+			&z.Int{Value: 3},
+			&z.Int{Value: 4},
+			&z.Int{Value: 5},
 		}},
 	}}, 7)
-	testCountObjects(t, tengo.TrueValue, 1)
-	testCountObjects(t, tengo.FalseValue, 1)
-	testCountObjects(t, &tengo.BuiltinFunction{}, 1)
-	testCountObjects(t, &tengo.Bytes{Value: []byte("foobar")}, 1)
-	testCountObjects(t, &tengo.Char{Value: '가'}, 1)
-	testCountObjects(t, &tengo.CompiledFunction{}, 1)
-	testCountObjects(t, &tengo.Error{Value: &tengo.Int{Value: 5}}, 2)
-	testCountObjects(t, &tengo.Float{Value: 19.84}, 1)
-	testCountObjects(t, &tengo.ImmutableArray{Value: []tengo.Object{
-		&tengo.Int{Value: 1},
-		&tengo.Int{Value: 2},
-		&tengo.ImmutableArray{Value: []tengo.Object{
-			&tengo.Int{Value: 3},
-			&tengo.Int{Value: 4},
-			&tengo.Int{Value: 5},
+	testCountObjects(t, z.TrueValue, 1)
+	testCountObjects(t, z.FalseValue, 1)
+	testCountObjects(t, &z.BuiltinFunction{}, 1)
+	testCountObjects(t, &z.Bytes{Value: []byte("foobar")}, 1)
+	testCountObjects(t, &z.Char{Value: '가'}, 1)
+	testCountObjects(t, &z.CompiledFunction{}, 1)
+	testCountObjects(t, &z.Error{Value: &z.Int{Value: 5}}, 2)
+	testCountObjects(t, &z.Float{Value: 19.84}, 1)
+	testCountObjects(t, &z.ImmutableArray{Value: []z.Object{
+		&z.Int{Value: 1},
+		&z.Int{Value: 2},
+		&z.ImmutableArray{Value: []z.Object{
+			&z.Int{Value: 3},
+			&z.Int{Value: 4},
+			&z.Int{Value: 5},
 		}},
 	}}, 7)
-	testCountObjects(t, &tengo.ImmutableMap{
-		Value: map[string]tengo.Object{
-			"k1": &tengo.Int{Value: 1},
-			"k2": &tengo.Int{Value: 2},
-			"k3": &tengo.Array{Value: []tengo.Object{
-				&tengo.Int{Value: 3},
-				&tengo.Int{Value: 4},
-				&tengo.Int{Value: 5},
+	testCountObjects(t, &z.ImmutableMap{
+		Value: map[string]z.Object{
+			"k1": &z.Int{Value: 1},
+			"k2": &z.Int{Value: 2},
+			"k3": &z.Array{Value: []z.Object{
+				&z.Int{Value: 3},
+				&z.Int{Value: 4},
+				&z.Int{Value: 5},
 			}},
 		}}, 7)
-	testCountObjects(t, &tengo.Int{Value: 1984}, 1)
-	testCountObjects(t, &tengo.Map{Value: map[string]tengo.Object{
-		"k1": &tengo.Int{Value: 1},
-		"k2": &tengo.Int{Value: 2},
-		"k3": &tengo.Array{Value: []tengo.Object{
-			&tengo.Int{Value: 3},
-			&tengo.Int{Value: 4},
-			&tengo.Int{Value: 5},
+	testCountObjects(t, &z.Int{Value: 1984}, 1)
+	testCountObjects(t, &z.Map{Value: map[string]z.Object{
+		"k1": &z.Int{Value: 1},
+		"k2": &z.Int{Value: 2},
+		"k3": &z.Array{Value: []z.Object{
+			&z.Int{Value: 3},
+			&z.Int{Value: 4},
+			&z.Int{Value: 5},
 		}},
 	}}, 7)
-	testCountObjects(t, &tengo.String{Value: "foo bar"}, 1)
-	testCountObjects(t, &tengo.Time{Value: time.Now()}, 1)
-	testCountObjects(t, tengo.UndefinedValue, 1)
+	testCountObjects(t, &z.String{Value: "foo bar"}, 1)
+	testCountObjects(t, &z.Time{Value: time.Now()}, 1)
+	testCountObjects(t, z.UndefinedValue, 1)
 }
 
-func testCountObjects(t *testing.T, o tengo.Object, expected int) {
-	require.Equal(t, expected, tengo.CountObjects(o))
+func testCountObjects(t *testing.T, o z.Object, expected int) {
+	require.Equal(t, expected, z.CountObjects(o))
 }
 
 func assertInstructionString(
@@ -123,7 +123,7 @@ func assertInstructionString(
 		concatted = append(concatted, e...)
 	}
 	require.Equal(t, expected, strings.Join(
-		tengo.FormatInstructions(concatted, 0), "\n"))
+		z.FormatInstructions(concatted, 0), "\n"))
 }
 
 func makeInstruction(
@@ -132,6 +132,6 @@ func makeInstruction(
 	opcode parser.Opcode,
 	operands ...int,
 ) {
-	inst := tengo.MakeInstruction(opcode, operands...)
+	inst := z.MakeInstruction(opcode, operands...)
 	require.Equal(t, expected, inst)
 }

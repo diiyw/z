@@ -1,4 +1,4 @@
-package tengo_test
+package z_test
 
 import (
 	"context"
@@ -18,19 +18,19 @@ import (
 )
 
 func TestScript_Add(t *testing.T) {
-	s := tengo.NewScript([]byte(`a := b; c := test(b); d := test(5)`))
+	s := z.NewScript([]byte(`a := b; c := test(b); d := test(5)`))
 	require.NoError(t, s.Add("b", 5))     // b = 5
 	require.NoError(t, s.Add("b", "foo")) // b = "foo"  (re-define before compilation)
 	require.NoError(t, s.Add("test",
-		func(args ...tengo.Object) (ret tengo.Object, err error) {
+		func(args ...z.Object) (ret z.Object, err error) {
 			if len(args) > 0 {
 				switch arg := args[0].(type) {
-				case *tengo.Int:
-					return &tengo.Int{Value: arg.Value + 1}, nil
+				case *z.Int:
+					return &z.Int{Value: arg.Value + 1}, nil
 				}
 			}
 
-			return &tengo.Int{Value: 0}, nil
+			return &z.Int{Value: 0}, nil
 		}))
 	c, err := s.Compile()
 	require.NoError(t, err)
@@ -42,7 +42,7 @@ func TestScript_Add(t *testing.T) {
 }
 
 func TestScript_Remove(t *testing.T) {
-	s := tengo.NewScript([]byte(`a := b`))
+	s := z.NewScript([]byte(`a := b`))
 	err := s.Add("b", 5)
 	require.NoError(t, err)
 	require.True(t, s.Remove("b")) // b is removed
@@ -51,7 +51,7 @@ func TestScript_Remove(t *testing.T) {
 }
 
 func TestScript_Run(t *testing.T) {
-	s := tengo.NewScript([]byte(`a := b`))
+	s := z.NewScript([]byte(`a := b`))
 	err := s.Add("b", 5)
 	require.NoError(t, err)
 	c, err := s.Run()
@@ -61,7 +61,7 @@ func TestScript_Run(t *testing.T) {
 }
 
 func TestScript_BuiltinModules(t *testing.T) {
-	s := tengo.NewScript([]byte(`math := import("math"); a := math.abs(-19.84)`))
+	s := z.NewScript([]byte(`math := import("math"); a := math.abs(-19.84)`))
 	s.SetImports(stdlib.GetModuleMap("math"))
 	c, err := s.Run()
 	require.NoError(t, err)
@@ -83,7 +83,7 @@ func TestScript_BuiltinModules(t *testing.T) {
 }
 
 func TestScript_SourceModules(t *testing.T) {
-	s := tengo.NewScript([]byte(`
+	s := z.NewScript([]byte(`
 enum := import("enum")
 a := enum.all([1,2,3], func(_, v) { 
 	return v > 0 
@@ -102,7 +102,7 @@ a := enum.all([1,2,3], func(_, v) {
 
 func TestScript_SetMaxConstObjects(t *testing.T) {
 	// one constant '5'
-	s := tengo.NewScript([]byte(`a := 5`))
+	s := z.NewScript([]byte(`a := 5`))
 	s.SetMaxConstObjects(1) // limit = 1
 	_, err := s.Compile()
 	require.NoError(t, err)
@@ -112,7 +112,7 @@ func TestScript_SetMaxConstObjects(t *testing.T) {
 	require.Equal(t, "exceeding constant objects limit: 1", err.Error())
 
 	// two constants '5' and '1'
-	s = tengo.NewScript([]byte(`a := 5 + 1`))
+	s = z.NewScript([]byte(`a := 5 + 1`))
 	s.SetMaxConstObjects(2) // limit = 2
 	_, err = s.Compile()
 	require.NoError(t, err)
@@ -122,7 +122,7 @@ func TestScript_SetMaxConstObjects(t *testing.T) {
 	require.Equal(t, "exceeding constant objects limit: 2", err.Error())
 
 	// duplicates will be removed
-	s = tengo.NewScript([]byte(`a := 5 + 5`))
+	s = z.NewScript([]byte(`a := 5 + 5`))
 	s.SetMaxConstObjects(1) // limit = 1
 	_, err = s.Compile()
 	require.NoError(t, err)
@@ -132,7 +132,7 @@ func TestScript_SetMaxConstObjects(t *testing.T) {
 	require.Equal(t, "exceeding constant objects limit: 1", err.Error())
 
 	// no limit set
-	s = tengo.NewScript([]byte(`a := 1 + 2 + 3 + 4 + 5`))
+	s = z.NewScript([]byte(`a := 1 + 2 + 3 + 4 + 5`))
 	_, err = s.Compile()
 	require.NoError(t, err)
 }
@@ -171,30 +171,30 @@ for i:=1; i<=d; i++ {
 
 e := mod1.double(s)
 `)
-	mod1 := map[string]tengo.Object{
-		"double": &tengo.UserFunction{
-			Value: func(args ...tengo.Object) (
-				ret tengo.Object,
+	mod1 := map[string]z.Object{
+		"double": &z.UserFunction{
+			Value: func(args ...z.Object) (
+				ret z.Object,
 				err error,
 			) {
-				arg0, _ := tengo.ToInt64(args[0])
-				ret = &tengo.Int{Value: arg0 * 2}
+				arg0, _ := z.ToInt64(args[0])
+				ret = &z.Int{Value: arg0 * 2}
 				return
 			},
 		},
 	}
 
-	scr := tengo.NewScript(code)
+	scr := z.NewScript(code)
 	_ = scr.Add("a", 0)
 	_ = scr.Add("b", 0)
 	_ = scr.Add("c", 0)
-	mods := tengo.NewModuleMap()
+	mods := z.NewModuleMap()
 	mods.AddBuiltinModule("mod1", mod1)
 	scr.SetImports(mods)
 	compiled, err := scr.Compile()
 	require.NoError(t, err)
 
-	executeFn := func(compiled *tengo.Compiled, a, b, c int) (d, e int) {
+	executeFn := func(compiled *z.Compiled, a, b, c int) (d, e int) {
 		_ = compiled.Set("a", a)
 		_ = compiled.Set("b", b)
 		_ = compiled.Set("c", c)
@@ -209,7 +209,7 @@ e := mod1.double(s)
 	var wg sync.WaitGroup
 	wg.Add(concurrency)
 	for i := 0; i < concurrency; i++ {
-		go func(compiled *tengo.Compiled) {
+		go func(compiled *z.Compiled) {
 			time.Sleep(time.Duration(rand.Int63n(50)) * time.Millisecond)
 			defer wg.Done()
 
@@ -228,7 +228,7 @@ e := mod1.double(s)
 }
 
 type Counter struct {
-	tengo.ObjectImpl
+	z.ObjectImpl
 	value int64
 }
 
@@ -242,8 +242,8 @@ func (o *Counter) String() string {
 
 func (o *Counter) BinaryOp(
 	op token.Token,
-	rhs tengo.Object,
-) (tengo.Object, error) {
+	rhs z.Object,
+) (z.Object, error) {
 	switch rhs := rhs.(type) {
 	case *Counter:
 		switch op {
@@ -252,7 +252,7 @@ func (o *Counter) BinaryOp(
 		case token.Sub:
 			return &Counter{value: o.value - rhs.value}, nil
 		}
-	case *tengo.Int:
+	case *z.Int:
 		switch op {
 		case token.Add:
 			return &Counter{value: o.value + rhs.Value}, nil
@@ -268,7 +268,7 @@ func (o *Counter) IsFalsy() bool {
 	return o.value == 0
 }
 
-func (o *Counter) Equals(t tengo.Object) bool {
+func (o *Counter) Equals(t z.Object) bool {
 	if tc, ok := t.(*Counter); ok {
 		return o.value == tc.value
 	}
@@ -276,12 +276,12 @@ func (o *Counter) Equals(t tengo.Object) bool {
 	return false
 }
 
-func (o *Counter) Copy() tengo.Object {
+func (o *Counter) Copy() z.Object {
 	return &Counter{value: o.value}
 }
 
-func (o *Counter) Call(_ ...tengo.Object) (tengo.Object, error) {
-	return &tengo.Int{Value: o.value}, nil
+func (o *Counter) Call(_ ...z.Object) (z.Object, error) {
+	return &z.Int{Value: o.value}, nil
 }
 
 func (o *Counter) CanCall() bool {
@@ -312,7 +312,7 @@ out := c1()
 
 func compiledGetCounter(
 	t *testing.T,
-	c *tengo.Compiled,
+	c *z.Compiled,
 	name string,
 	expected *Counter,
 ) {
@@ -326,8 +326,8 @@ func compiledGetCounter(
 
 func TestScriptSourceModule(t *testing.T) {
 	// script1 imports "mod1"
-	scr := tengo.NewScript([]byte(`out := import("mod")`))
-	mods := tengo.NewModuleMap()
+	scr := z.NewScript([]byte(`out := import("mod")`))
+	mods := z.NewModuleMap()
 	mods.AddSourceModule("mod", []byte(`export 5`))
 	scr.SetImports(mods)
 	c, err := scr.Run()
@@ -335,8 +335,8 @@ func TestScriptSourceModule(t *testing.T) {
 	require.Equal(t, int64(5), c.Get("out").Value())
 
 	// executing module function
-	scr = tengo.NewScript([]byte(`fn := import("mod"); out := fn()`))
-	mods = tengo.NewModuleMap()
+	scr = z.NewScript([]byte(`fn := import("mod"); out := fn()`))
+	mods = z.NewModuleMap()
 	mods.AddSourceModule("mod",
 		[]byte(`a := 3; export func() { return a + 5 }`))
 	scr.SetImports(mods)
@@ -344,17 +344,17 @@ func TestScriptSourceModule(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, int64(8), c.Get("out").Value())
 
-	scr = tengo.NewScript([]byte(`out := import("mod")`))
-	mods = tengo.NewModuleMap()
+	scr = z.NewScript([]byte(`out := import("mod")`))
+	mods = z.NewModuleMap()
 	mods.AddSourceModule("mod",
 		[]byte(`text := import("text"); export text.title("foo")`))
 	mods.AddBuiltinModule("text",
-		map[string]tengo.Object{
-			"title": &tengo.UserFunction{
+		map[string]z.Object{
+			"title": &z.UserFunction{
 				Name: "title",
-				Value: func(args ...tengo.Object) (tengo.Object, error) {
-					s, _ := tengo.ToString(args[0])
-					return &tengo.String{Value: strings.Title(s)}, nil
+				Value: func(args ...z.Object) (z.Object, error) {
+					s, _ := z.ToString(args[0])
+					return &z.String{Value: strings.Title(s)}, nil
 				}},
 		})
 	scr.SetImports(mods)
@@ -383,7 +383,7 @@ func BenchmarkArrayIndexCompare(b *testing.B) {
 }
 
 func bench(n int, input string) {
-	s := tengo.NewScript([]byte(input))
+	s := z.NewScript([]byte(input))
 	c, err := s.Compile()
 	if err != nil {
 		panic(err)
@@ -493,7 +493,7 @@ func TestCompiled_CustomObject(t *testing.T) {
 // customNumber is a user defined object that can compare to tengo.Int
 // very shitty implementation, just to test that token.Less and token.Greater in BinaryOp works
 type customNumber struct {
-	tengo.ObjectImpl
+	z.ObjectImpl
 	value int64
 }
 
@@ -505,40 +505,40 @@ func (n *customNumber) String() string {
 	return strconv.FormatInt(n.value, 10)
 }
 
-func (n *customNumber) BinaryOp(op token.Token, rhs tengo.Object) (tengo.Object, error) {
-	tengoInt, ok := rhs.(*tengo.Int)
+func (n *customNumber) BinaryOp(op token.Token, rhs z.Object) (z.Object, error) {
+	tengoInt, ok := rhs.(*z.Int)
 	if !ok {
-		return nil, tengo.ErrInvalidOperator
+		return nil, z.ErrInvalidOperator
 	}
 	return n.binaryOpInt(op, tengoInt)
 }
 
-func (n *customNumber) binaryOpInt(op token.Token, rhs *tengo.Int) (tengo.Object, error) {
+func (n *customNumber) binaryOpInt(op token.Token, rhs *z.Int) (z.Object, error) {
 	i := n.value
 
 	switch op {
 	case token.Less:
 		if i < rhs.Value {
-			return tengo.TrueValue, nil
+			return z.TrueValue, nil
 		}
-		return tengo.FalseValue, nil
+		return z.FalseValue, nil
 	case token.Greater:
 		if i > rhs.Value {
-			return tengo.TrueValue, nil
+			return z.TrueValue, nil
 		}
-		return tengo.FalseValue, nil
+		return z.FalseValue, nil
 	case token.LessEq:
 		if i <= rhs.Value {
-			return tengo.TrueValue, nil
+			return z.TrueValue, nil
 		}
-		return tengo.FalseValue, nil
+		return z.FalseValue, nil
 	case token.GreaterEq:
 		if i >= rhs.Value {
-			return tengo.TrueValue, nil
+			return z.TrueValue, nil
 		}
-		return tengo.FalseValue, nil
+		return z.FalseValue, nil
 	}
-	return nil, tengo.ErrInvalidOperator
+	return nil, z.ErrInvalidOperator
 }
 
 func TestScript_ImportError(t *testing.T) {
@@ -559,8 +559,8 @@ export func(ctx) {
 	return closure()
 }`
 
-	s := tengo.NewScript([]byte(m))
-	mods := tengo.NewModuleMap()
+	s := z.NewScript([]byte(m))
+	mods := z.NewModuleMap()
 	mods.AddSourceModule("expression", []byte(src))
 	s.SetImports(mods)
 
@@ -573,8 +573,8 @@ export func(ctx) {
 	require.True(t, strings.Contains(err.Error(), "expression:4:6"))
 }
 
-func compile(t *testing.T, input string, vars M) *tengo.Compiled {
-	s := tengo.NewScript([]byte(input))
+func compile(t *testing.T, input string, vars M) *z.Compiled {
+	s := z.NewScript([]byte(input))
 	for vn, vv := range vars {
 		err := s.Add(vn, vv)
 		require.NoError(t, err)
@@ -587,7 +587,7 @@ func compile(t *testing.T, input string, vars M) *tengo.Compiled {
 }
 
 func compileError(t *testing.T, input string, vars M) {
-	s := tengo.NewScript([]byte(input))
+	s := z.NewScript([]byte(input))
 	for vn, vv := range vars {
 		err := s.Add(vn, vv)
 		require.NoError(t, err)
@@ -596,14 +596,14 @@ func compileError(t *testing.T, input string, vars M) {
 	require.Error(t, err)
 }
 
-func compiledRun(t *testing.T, c *tengo.Compiled) {
+func compiledRun(t *testing.T, c *z.Compiled) {
 	err := c.Run()
 	require.NoError(t, err)
 }
 
 func compiledGet(
 	t *testing.T,
-	c *tengo.Compiled,
+	c *z.Compiled,
 	name string,
 	expected interface{},
 ) {
@@ -614,7 +614,7 @@ func compiledGet(
 
 func compiledGetAll(
 	t *testing.T,
-	c *tengo.Compiled,
+	c *z.Compiled,
 	expected M,
 ) {
 	vars := c.GetAll()
@@ -634,14 +634,14 @@ func compiledGetAll(
 
 func compiledIsDefined(
 	t *testing.T,
-	c *tengo.Compiled,
+	c *z.Compiled,
 	name string,
 	expected bool,
 ) {
 	require.Equal(t, expected, c.IsDefined(name))
 }
 func TestCompiled_Clone(t *testing.T) {
-	script := tengo.NewScript([]byte(`
+	script := z.NewScript([]byte(`
 count += 1
 data["b"] = 2
 `))

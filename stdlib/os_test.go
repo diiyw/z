@@ -20,7 +20,7 @@ func TestReadFile(t *testing.T) {
 	_ = tf.Close()
 
 	module(t, "os").call("read_file", tf.Name()).
-		expect(&tengo.Bytes{Value: content})
+		expect(&z.Bytes{Value: content})
 }
 
 func TestReadFileArgs(t *testing.T) {
@@ -46,13 +46,13 @@ func TestFileStatFile(t *testing.T) {
 		return
 	}
 
-	module(t, "os").call("stat", tf.Name()).expect(&tengo.ImmutableMap{
-		Value: map[string]tengo.Object{
-			"name":      &tengo.String{Value: stat.Name()},
-			"mtime":     &tengo.Time{Value: stat.ModTime()},
-			"size":      &tengo.Int{Value: stat.Size()},
-			"mode":      &tengo.Int{Value: int64(stat.Mode())},
-			"directory": tengo.FalseValue,
+	module(t, "os").call("stat", tf.Name()).expect(&z.ImmutableMap{
+		Value: map[string]z.Object{
+			"name":      &z.String{Value: stat.Name()},
+			"mtime":     &z.Time{Value: stat.ModTime()},
+			"size":      &z.Int{Value: stat.Size()},
+			"mode":      &z.Int{Value: int64(stat.Mode())},
+			"directory": z.FalseValue,
 		},
 	})
 }
@@ -65,21 +65,21 @@ func TestFileStatDir(t *testing.T) {
 	stat, err := os.Stat(td)
 	require.NoError(t, err)
 
-	module(t, "os").call("stat", td).expect(&tengo.ImmutableMap{
-		Value: map[string]tengo.Object{
-			"name":      &tengo.String{Value: stat.Name()},
-			"mtime":     &tengo.Time{Value: stat.ModTime()},
-			"size":      &tengo.Int{Value: stat.Size()},
-			"mode":      &tengo.Int{Value: int64(stat.Mode())},
-			"directory": tengo.TrueValue,
+	module(t, "os").call("stat", td).expect(&z.ImmutableMap{
+		Value: map[string]z.Object{
+			"name":      &z.String{Value: stat.Name()},
+			"mtime":     &z.Time{Value: stat.ModTime()},
+			"size":      &z.Int{Value: stat.Size()},
+			"mode":      &z.Int{Value: int64(stat.Mode())},
+			"directory": z.TrueValue,
 		},
 	})
 }
 
 func TestOSExpandEnv(t *testing.T) {
-	curMaxStringLen := tengo.MaxStringLen
-	defer func() { tengo.MaxStringLen = curMaxStringLen }()
-	tengo.MaxStringLen = 12
+	curMaxStringLen := z.MaxStringLen
+	defer func() { z.MaxStringLen = curMaxStringLen }()
+	z.MaxStringLen = 12
 
 	_ = os.Setenv("TENGO", "FOO BAR")
 	module(t, "os").call("expand_env", "$TENGO").expect("FOO BAR")

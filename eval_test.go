@@ -1,4 +1,4 @@
-package tengo_test
+package z_test
 
 import (
 	"context"
@@ -15,7 +15,7 @@ func TestEval(t *testing.T) {
 		expected interface{},
 	) {
 		ctx := context.Background()
-		actual, err := tengo.Eval(ctx, expr, params)
+		actual, err := z.Eval(ctx, expr, params)
 		require.NoError(t, err)
 		require.Equal(t, expected, actual)
 	}

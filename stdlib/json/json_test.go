@@ -59,7 +59,7 @@ func TestJSON(t *testing.T) {
 		"arr": ARR{1, 2, 3, MAP{"a": false, "b": 109.4}}})
 
 	testJSONEncodeDecode(t, MAP{"id1": 7075984636689534001, "id2": 7075984636689534002})
-	testJSONEncodeDecode(t, ARR{1e3, 1E7})
+	testJSONEncodeDecode(t, ARR{1e3, 1e7})
 }
 
 func TestDecode(t *testing.T) {
@@ -92,7 +92,7 @@ func testDecodeError(t *testing.T, input string) {
 }
 
 func testJSONEncodeDecode(t *testing.T, v interface{}) {
-	o, err := tengo.FromInterface(v)
+	o, err := z.FromInterface(v)
 	require.NoError(t, err)
 
 	b, err := json.Encode(o)
@@ -104,7 +104,7 @@ func testJSONEncodeDecode(t *testing.T, v interface{}) {
 	vj, err := gojson.Marshal(v)
 	require.NoError(t, err)
 
-	aj, err := gojson.Marshal(tengo.ToInterface(a))
+	aj, err := gojson.Marshal(z.ToInterface(a))
 	require.NoError(t, err)
 
 	require.Equal(t, vj, aj)

@@ -6,7 +6,7 @@ import (
 	"github.com/d5/tengo/v2"
 )
 
-var hexModule = map[string]tengo.Object{
-	"encode": &tengo.UserFunction{Value: FuncAYRS(hex.EncodeToString)},
-	"decode": &tengo.UserFunction{Value: FuncASRYE(hex.DecodeString)},
+var hexModule = map[string]z.Object{
+	"encode": &z.UserFunction{Value: FuncAYRS(hex.EncodeToString)},
+	"decode": &z.UserFunction{Value: FuncASRYE(hex.DecodeString)},
 }

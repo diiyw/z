@@ -105,20 +105,20 @@ func (c callres) call(funcName string, args ...interface{}) callres {
 		return c
 	}
 
-	var oargs []tengo.Object
+	var oargs []z.Object
 	for _, v := range args {
 		oargs = append(oargs, object(v))
 	}
 
 	switch o := c.o.(type) {
-	case *tengo.BuiltinModule:
+	case *z.BuiltinModule:
 		m, ok := o.Attrs[funcName]
 		if !ok {
 			return callres{t: c.t, e: fmt.Errorf(
 				"function not found: %s", funcName)}
 		}
 
-		f, ok := m.(*tengo.UserFunction)
+		f, ok := m.(*z.UserFunction)
 		if !ok {
 			return callres{t: c.t, e: fmt.Errorf(
 				"non-callable: %s", funcName)}
@@ -126,16 +126,16 @@ func (c callres) call(funcName string, args ...interface{}) callres {
 
 		res, err := f.Value(oargs...)
 		return callres{t: c.t, o: res, e: err}
-	case *tengo.UserFunction:
+	case *z.UserFunction:
 		res, err := o.Value(oargs...)
 		return callres{t: c.t, o: res, e: err}
-	case *tengo.ImmutableMap:
+	case *z.ImmutableMap:
 		m, ok := o.Value[funcName]
 		if !ok {
 			return callres{t: c.t, e: fmt.Errorf("function not found: %s", funcName)}
 		}
 
-		f, ok := m.(*tengo.UserFunction)
+		f, ok := m.(*z.UserFunction)
 		if !ok {
 			return callres{t: c.t, e: fmt.Errorf("non-callable: %s", funcName)}
 		}
@@ -165,73 +165,73 @@ func module(t *testing.T, moduleName string) callres {
 	return callres{t: t, o: mod}
 }
 
-func object(v interface{}) tengo.Object {
+func object(v interface{}) z.Object {
 	switch v := v.(type) {
-	case tengo.Object:
+	case z.Object:
 		return v
 	case string:
-		return &tengo.String{Value: v}
+		return &z.String{Value: v}
 	case int64:
-		return &tengo.Int{Value: v}
+		return &z.Int{Value: v}
 	case int: // for convenience
-		return &tengo.Int{Value: int64(v)}
+		return &z.Int{Value: int64(v)}
 	case bool:
 		if v {
-			return tengo.TrueValue
+			return z.TrueValue
 		}
-		return tengo.FalseValue
+		return z.FalseValue
 	case rune:
-		return &tengo.Char{Value: v}
+		return &z.Char{Value: v}
 	case byte: // for convenience
-		return &tengo.Char{Value: rune(v)}
+		return &z.Char{Value: rune(v)}
 	case float64:
-		return &tengo.Float{Value: v}
+		return &z.Float{Value: v}
 	case []byte:
-		return &tengo.Bytes{Value: v}
+		return &z.Bytes{Value: v}
 	case MAP:
-		objs := make(map[string]tengo.Object)
+		objs := make(map[string]z.Object)
 		for k, v := range v {
 			objs[k] = object(v)
 		}
 
-		return &tengo.Map{Value: objs}
+		return &z.Map{Value: objs}
 	case ARR:
-		var objs []tengo.Object
+		var objs []z.Object
 		for _, e := range v {
 			objs = append(objs, object(e))
 		}
 
-		return &tengo.Array{Value: objs}
+		return &z.Array{Value: objs}
 	case IMAP:
-		objs := make(map[string]tengo.Object)
+		objs := make(map[string]z.Object)
 		for k, v := range v {
 			objs[k] = object(v)
 		}
 
-		return &tengo.ImmutableMap{Value: objs}
+		return &z.ImmutableMap{Value: objs}
 	case IARR:
-		var objs []tengo.Object
+		var objs []z.Object
 		for _, e := range v {
 			objs = append(objs, object(e))
 		}
 
-		return &tengo.ImmutableArray{Value: objs}
+		return &z.ImmutableArray{Value: objs}
 	case time.Time:
-		return &tengo.Time{Value: v}
+		return &z.Time{Value: v}
 	case []int:
-		var objs []tengo.Object
+		var objs []z.Object
 		for _, e := range v {
-			objs = append(objs, &tengo.Int{Value: int64(e)})
+			objs = append(objs, &z.Int{Value: int64(e)})
 		}
 
-		return &tengo.Array{Value: objs}
+		return &z.Array{Value: objs}
 	}
 
 	panic(fmt.Errorf("unknown type: %T", v))
 }
 
 func expect(t *testing.T, input string, expected interface{}) {
-	s := tengo.NewScript([]byte(input))
+	s := z.NewScript([]byte(input))
 	s.SetImports(stdlib.GetModuleMap(stdlib.AllModuleNames()...))
 	c, err := s.Run()
 	require.NoError(t, err)

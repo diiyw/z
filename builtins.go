@@ -1,4 +1,4 @@
-package tengo
+package z
 
 var builtinFuncs = []*BuiltinFunction{
 	{
@@ -327,7 +327,7 @@ func builtinLen(args ...Object) (Object, error) {
 	}
 }
 
-//range(start, stop[, step])
+// range(start, stop[, step])
 func builtinRange(args ...Object) (Object, error) {
 	numArgs := len(args)
 	if numArgs < 2 || numArgs > 3 {

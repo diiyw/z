@@ -6,241 +6,241 @@ import (
 	"github.com/d5/tengo/v2"
 )
 
-var mathModule = map[string]tengo.Object{
-	"e":                      &tengo.Float{Value: math.E},
-	"pi":                     &tengo.Float{Value: math.Pi},
-	"phi":                    &tengo.Float{Value: math.Phi},
-	"sqrt2":                  &tengo.Float{Value: math.Sqrt2},
-	"sqrtE":                  &tengo.Float{Value: math.SqrtE},
-	"sqrtPi":                 &tengo.Float{Value: math.SqrtPi},
-	"sqrtPhi":                &tengo.Float{Value: math.SqrtPhi},
-	"ln2":                    &tengo.Float{Value: math.Ln2},
-	"log2E":                  &tengo.Float{Value: math.Log2E},
-	"ln10":                   &tengo.Float{Value: math.Ln10},
-	"log10E":                 &tengo.Float{Value: math.Log10E},
-	"maxFloat32":             &tengo.Float{Value: math.MaxFloat32},
-	"smallestNonzeroFloat32": &tengo.Float{Value: math.SmallestNonzeroFloat32},
-	"maxFloat64":             &tengo.Float{Value: math.MaxFloat64},
-	"smallestNonzeroFloat64": &tengo.Float{Value: math.SmallestNonzeroFloat64},
-	"maxInt":                 &tengo.Int{Value: math.MaxInt},
-	"minInt":                 &tengo.Int{Value: math.MinInt},
-	"maxInt8":                &tengo.Int{Value: math.MaxInt8},
-	"minInt8":                &tengo.Int{Value: math.MinInt8},
-	"maxInt16":               &tengo.Int{Value: math.MaxInt16},
-	"minInt16":               &tengo.Int{Value: math.MinInt16},
-	"maxInt32":               &tengo.Int{Value: math.MaxInt32},
-	"minInt32":               &tengo.Int{Value: math.MinInt32},
-	"maxInt64":               &tengo.Int{Value: math.MaxInt64},
-	"minInt64":               &tengo.Int{Value: math.MinInt64},
-	"abs": &tengo.UserFunction{
+var mathModule = map[string]z.Object{
+	"e":                      &z.Float{Value: math.E},
+	"pi":                     &z.Float{Value: math.Pi},
+	"phi":                    &z.Float{Value: math.Phi},
+	"sqrt2":                  &z.Float{Value: math.Sqrt2},
+	"sqrtE":                  &z.Float{Value: math.SqrtE},
+	"sqrtPi":                 &z.Float{Value: math.SqrtPi},
+	"sqrtPhi":                &z.Float{Value: math.SqrtPhi},
+	"ln2":                    &z.Float{Value: math.Ln2},
+	"log2E":                  &z.Float{Value: math.Log2E},
+	"ln10":                   &z.Float{Value: math.Ln10},
+	"log10E":                 &z.Float{Value: math.Log10E},
+	"maxFloat32":             &z.Float{Value: math.MaxFloat32},
+	"smallestNonzeroFloat32": &z.Float{Value: math.SmallestNonzeroFloat32},
+	"maxFloat64":             &z.Float{Value: math.MaxFloat64},
+	"smallestNonzeroFloat64": &z.Float{Value: math.SmallestNonzeroFloat64},
+	"maxInt":                 &z.Int{Value: math.MaxInt},
+	"minInt":                 &z.Int{Value: math.MinInt},
+	"maxInt8":                &z.Int{Value: math.MaxInt8},
+	"minInt8":                &z.Int{Value: math.MinInt8},
+	"maxInt16":               &z.Int{Value: math.MaxInt16},
+	"minInt16":               &z.Int{Value: math.MinInt16},
+	"maxInt32":               &z.Int{Value: math.MaxInt32},
+	"minInt32":               &z.Int{Value: math.MinInt32},
+	"maxInt64":               &z.Int{Value: math.MaxInt64},
+	"minInt64":               &z.Int{Value: math.MinInt64},
+	"abs": &z.UserFunction{
 		Name:  "abs",
 		Value: FuncAFRF(math.Abs),
 	},
-	"acos": &tengo.UserFunction{
+	"acos": &z.UserFunction{
 		Name:  "acos",
 		Value: FuncAFRF(math.Acos),
 	},
-	"acosh": &tengo.UserFunction{
+	"acosh": &z.UserFunction{
 		Name:  "acosh",
 		Value: FuncAFRF(math.Acosh),
 	},
-	"asin": &tengo.UserFunction{
+	"asin": &z.UserFunction{
 		Name:  "asin",
 		Value: FuncAFRF(math.Asin),
 	},
-	"asinh": &tengo.UserFunction{
+	"asinh": &z.UserFunction{
 		Name:  "asinh",
 		Value: FuncAFRF(math.Asinh),
 	},
-	"atan": &tengo.UserFunction{
+	"atan": &z.UserFunction{
 		Name:  "atan",
 		Value: FuncAFRF(math.Atan),
 	},
-	"atan2": &tengo.UserFunction{
+	"atan2": &z.UserFunction{
 		Name:  "atan2",
 		Value: FuncAFFRF(math.Atan2),
 	},
-	"atanh": &tengo.UserFunction{
+	"atanh": &z.UserFunction{
 		Name:  "atanh",
 		Value: FuncAFRF(math.Atanh),
 	},
-	"cbrt": &tengo.UserFunction{
+	"cbrt": &z.UserFunction{
 		Name:  "cbrt",
 		Value: FuncAFRF(math.Cbrt),
 	},
-	"ceil": &tengo.UserFunction{
+	"ceil": &z.UserFunction{
 		Name:  "ceil",
 		Value: FuncAFRF(math.Ceil),
 	},
-	"copysign": &tengo.UserFunction{
+	"copysign": &z.UserFunction{
 		Name:  "copysign",
 		Value: FuncAFFRF(math.Copysign),
 	},
-	"cos": &tengo.UserFunction{
+	"cos": &z.UserFunction{
 		Name:  "cos",
 		Value: FuncAFRF(math.Cos),
 	},
-	"cosh": &tengo.UserFunction{
+	"cosh": &z.UserFunction{
 		Name:  "cosh",
 		Value: FuncAFRF(math.Cosh),
 	},
-	"dim": &tengo.UserFunction{
+	"dim": &z.UserFunction{
 		Name:  "dim",
 		Value: FuncAFFRF(math.Dim),
 	},
-	"erf": &tengo.UserFunction{
+	"erf": &z.UserFunction{
 		Name:  "erf",
 		Value: FuncAFRF(math.Erf),
 	},
-	"erfc": &tengo.UserFunction{
+	"erfc": &z.UserFunction{
 		Name:  "erfc",
 		Value: FuncAFRF(math.Erfc),
 	},
-	"exp": &tengo.UserFunction{
+	"exp": &z.UserFunction{
 		Name:  "exp",
 		Value: FuncAFRF(math.Exp),
 	},
-	"exp2": &tengo.UserFunction{
+	"exp2": &z.UserFunction{
 		Name:  "exp2",
 		Value: FuncAFRF(math.Exp2),
 	},
-	"expm1": &tengo.UserFunction{
+	"expm1": &z.UserFunction{
 		Name:  "expm1",
 		Value: FuncAFRF(math.Expm1),
 	},
-	"floor": &tengo.UserFunction{
+	"floor": &z.UserFunction{
 		Name:  "floor",
 		Value: FuncAFRF(math.Floor),
 	},
-	"gamma": &tengo.UserFunction{
+	"gamma": &z.UserFunction{
 		Name:  "gamma",
 		Value: FuncAFRF(math.Gamma),
 	},
-	"hypot": &tengo.UserFunction{
+	"hypot": &z.UserFunction{
 		Name:  "hypot",
 		Value: FuncAFFRF(math.Hypot),
 	},
-	"ilogb": &tengo.UserFunction{
+	"ilogb": &z.UserFunction{
 		Name:  "ilogb",
 		Value: FuncAFRI(math.Ilogb),
 	},
-	"inf": &tengo.UserFunction{
+	"inf": &z.UserFunction{
 		Name:  "inf",
 		Value: FuncAIRF(math.Inf),
 	},
-	"is_inf": &tengo.UserFunction{
+	"is_inf": &z.UserFunction{
 		Name:  "is_inf",
 		Value: FuncAFIRB(math.IsInf),
 	},
-	"is_nan": &tengo.UserFunction{
+	"is_nan": &z.UserFunction{
 		Name:  "is_nan",
 		Value: FuncAFRB(math.IsNaN),
 	},
-	"j0": &tengo.UserFunction{
+	"j0": &z.UserFunction{
 		Name:  "j0",
 		Value: FuncAFRF(math.J0),
 	},
-	"j1": &tengo.UserFunction{
+	"j1": &z.UserFunction{
 		Name:  "j1",
 		Value: FuncAFRF(math.J1),
 	},
-	"jn": &tengo.UserFunction{
+	"jn": &z.UserFunction{
 		Name:  "jn",
 		Value: FuncAIFRF(math.Jn),
 	},
-	"ldexp": &tengo.UserFunction{
+	"ldexp": &z.UserFunction{
 		Name:  "ldexp",
 		Value: FuncAFIRF(math.Ldexp),
 	},
-	"log": &tengo.UserFunction{
+	"log": &z.UserFunction{
 		Name:  "log",
 		Value: FuncAFRF(math.Log),
 	},
-	"log10": &tengo.UserFunction{
+	"log10": &z.UserFunction{
 		Name:  "log10",
 		Value: FuncAFRF(math.Log10),
 	},
-	"log1p": &tengo.UserFunction{
+	"log1p": &z.UserFunction{
 		Name:  "log1p",
 		Value: FuncAFRF(math.Log1p),
 	},
-	"log2": &tengo.UserFunction{
+	"log2": &z.UserFunction{
 		Name:  "log2",
 		Value: FuncAFRF(math.Log2),
 	},
-	"logb": &tengo.UserFunction{
+	"logb": &z.UserFunction{
 		Name:  "logb",
 		Value: FuncAFRF(math.Logb),
 	},
-	"max": &tengo.UserFunction{
+	"max": &z.UserFunction{
 		Name:  "max",
 		Value: FuncAFFRF(math.Max),
 	},
-	"min": &tengo.UserFunction{
+	"min": &z.UserFunction{
 		Name:  "min",
 		Value: FuncAFFRF(math.Min),
 	},
-	"mod": &tengo.UserFunction{
+	"mod": &z.UserFunction{
 		Name:  "mod",
 		Value: FuncAFFRF(math.Mod),
 	},
-	"nan": &tengo.UserFunction{
+	"nan": &z.UserFunction{
 		Name:  "nan",
 		Value: FuncARF(math.NaN),
 	},
-	"nextafter": &tengo.UserFunction{
+	"nextafter": &z.UserFunction{
 		Name:  "nextafter",
 		Value: FuncAFFRF(math.Nextafter),
 	},
-	"pow": &tengo.UserFunction{
+	"pow": &z.UserFunction{
 		Name:  "pow",
 		Value: FuncAFFRF(math.Pow),
 	},
-	"pow10": &tengo.UserFunction{
+	"pow10": &z.UserFunction{
 		Name:  "pow10",
 		Value: FuncAIRF(math.Pow10),
 	},
-	"remainder": &tengo.UserFunction{
+	"remainder": &z.UserFunction{
 		Name:  "remainder",
 		Value: FuncAFFRF(math.Remainder),
 	},
-	"signbit": &tengo.UserFunction{
+	"signbit": &z.UserFunction{
 		Name:  "signbit",
 		Value: FuncAFRB(math.Signbit),
 	},
-	"sin": &tengo.UserFunction{
+	"sin": &z.UserFunction{
 		Name:  "sin",
 		Value: FuncAFRF(math.Sin),
 	},
-	"sinh": &tengo.UserFunction{
+	"sinh": &z.UserFunction{
 		Name:  "sinh",
 		Value: FuncAFRF(math.Sinh),
 	},
-	"sqrt": &tengo.UserFunction{
+	"sqrt": &z.UserFunction{
 		Name:  "sqrt",
 		Value: FuncAFRF(math.Sqrt),
 	},
-	"tan": &tengo.UserFunction{
+	"tan": &z.UserFunction{
 		Name:  "tan",
 		Value: FuncAFRF(math.Tan),
 	},
-	"tanh": &tengo.UserFunction{
+	"tanh": &z.UserFunction{
 		Name:  "tanh",
 		Value: FuncAFRF(math.Tanh),
 	},
-	"trunc": &tengo.UserFunction{
+	"trunc": &z.UserFunction{
 		Name:  "trunc",
 		Value: FuncAFRF(math.Trunc),
 	},
-	"y0": &tengo.UserFunction{
+	"y0": &z.UserFunction{
 		Name:  "y0",
 		Value: FuncAFRF(math.Y0),
 	},
-	"y1": &tengo.UserFunction{
+	"y1": &z.UserFunction{
 		Name:  "y1",
 		Value: FuncAFRF(math.Y1),
 	},
-	"yn": &tengo.UserFunction{
+	"yn": &z.UserFunction{
 		Name:  "yn",
 		Value: FuncAIFRF(math.Yn),
 	},

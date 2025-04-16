@@ -120,8 +120,8 @@ func Equal(
 		if expected != actual.(rune) {
 			failExpectedActual(t, expected, actual, msg...)
 		}
-	case *tengo.Symbol:
-		if !equalSymbol(expected, actual.(*tengo.Symbol)) {
+	case *z.Symbol:
+		if !equalSymbol(expected, actual.(*z.Symbol)) {
 			failExpectedActual(t, expected, actual, msg...)
 		}
 	case parser.Pos:
@@ -132,48 +132,48 @@ func Equal(
 		if expected != actual.(token.Token) {
 			failExpectedActual(t, expected, actual, msg...)
 		}
-	case []tengo.Object:
-		equalObjectSlice(t, expected, actual.([]tengo.Object), msg...)
-	case *tengo.Int:
-		Equal(t, expected.Value, actual.(*tengo.Int).Value, msg...)
-	case *tengo.Float:
-		Equal(t, expected.Value, actual.(*tengo.Float).Value, msg...)
-	case *tengo.String:
-		Equal(t, expected.Value, actual.(*tengo.String).Value, msg...)
-	case *tengo.Char:
-		Equal(t, expected.Value, actual.(*tengo.Char).Value, msg...)
-	case *tengo.Bool:
+	case []z.Object:
+		equalObjectSlice(t, expected, actual.([]z.Object), msg...)
+	case *z.Int:
+		Equal(t, expected.Value, actual.(*z.Int).Value, msg...)
+	case *z.Float:
+		Equal(t, expected.Value, actual.(*z.Float).Value, msg...)
+	case *z.String:
+		Equal(t, expected.Value, actual.(*z.String).Value, msg...)
+	case *z.Char:
+		Equal(t, expected.Value, actual.(*z.Char).Value, msg...)
+	case *z.Bool:
 		if expected != actual {
 			failExpectedActual(t, expected, actual, msg...)
 		}
-	case *tengo.Array:
+	case *z.Array:
 		equalObjectSlice(t, expected.Value,
-			actual.(*tengo.Array).Value, msg...)
-	case *tengo.ImmutableArray:
+			actual.(*z.Array).Value, msg...)
+	case *z.ImmutableArray:
 		equalObjectSlice(t, expected.Value,
-			actual.(*tengo.ImmutableArray).Value, msg...)
-	case *tengo.Bytes:
-		if !bytes.Equal(expected.Value, actual.(*tengo.Bytes).Value) {
+			actual.(*z.ImmutableArray).Value, msg...)
+	case *z.Bytes:
+		if !bytes.Equal(expected.Value, actual.(*z.Bytes).Value) {
 			failExpectedActual(t, string(expected.Value),
-				string(actual.(*tengo.Bytes).Value), msg...)
+				string(actual.(*z.Bytes).Value), msg...)
 		}
-	case *tengo.Map:
+	case *z.Map:
 		equalObjectMap(t, expected.Value,
-			actual.(*tengo.Map).Value, msg...)
-	case *tengo.ImmutableMap:
+			actual.(*z.Map).Value, msg...)
+	case *z.ImmutableMap:
 		equalObjectMap(t, expected.Value,
-			actual.(*tengo.ImmutableMap).Value, msg...)
-	case *tengo.CompiledFunction:
+			actual.(*z.ImmutableMap).Value, msg...)
+	case *z.CompiledFunction:
 		equalCompiledFunction(t, expected,
-			actual.(*tengo.CompiledFunction), msg...)
-	case *tengo.Undefined:
+			actual.(*z.CompiledFunction), msg...)
+	case *z.Undefined:
 		if expected != actual {
 			failExpectedActual(t, expected, actual, msg...)
 		}
-	case *tengo.Error:
-		Equal(t, expected.Value, actual.(*tengo.Error).Value, msg...)
-	case tengo.Object:
-		if !expected.Equals(actual.(tengo.Object)) {
+	case *z.Error:
+		Equal(t, expected.Value, actual.(*z.Error).Value, msg...)
+	case z.Object:
+		if !expected.Equals(actual.(z.Object)) {
 			failExpectedActual(t, expected, actual, msg...)
 		}
 	case *parser.SourceFileSet:
@@ -253,7 +253,7 @@ func equalStringSlice(a, b []string) bool {
 	return true
 }
 
-func equalSymbol(a, b *tengo.Symbol) bool {
+func equalSymbol(a, b *z.Symbol) bool {
 	return a.Name == b.Name &&
 		a.Index == b.Index &&
 		a.Scope == b.Scope
@@ -261,7 +261,7 @@ func equalSymbol(a, b *tengo.Symbol) bool {
 
 func equalObjectSlice(
 	t *testing.T,
-	expected, actual []tengo.Object,
+	expected, actual []z.Object,
 	msg ...interface{},
 ) {
 	Equal(t, len(expected), len(actual), msg...)
@@ -285,7 +285,7 @@ func equalFileSet(
 
 func equalObjectMap(
 	t *testing.T,
-	expected, actual map[string]tengo.Object,
+	expected, actual map[string]z.Object,
 	msg ...interface{},
 ) {
 	Equal(t, len(expected), len(actual), msg...)
@@ -297,14 +297,14 @@ func equalObjectMap(
 
 func equalCompiledFunction(
 	t *testing.T,
-	expected, actual tengo.Object,
+	expected, actual z.Object,
 	msg ...interface{},
 ) {
-	expectedT := expected.(*tengo.CompiledFunction)
-	actualT := actual.(*tengo.CompiledFunction)
+	expectedT := expected.(*z.CompiledFunction)
+	actualT := actual.(*z.CompiledFunction)
 	Equal(t,
-		tengo.FormatInstructions(expectedT.Instructions, 0),
-		tengo.FormatInstructions(actualT.Instructions, 0), msg...)
+		z.FormatInstructions(expectedT.Instructions, 0),
+		z.FormatInstructions(actualT.Instructions, 0), msg...)
 }
 
 func isNil(v interface{}) bool {

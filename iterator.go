@@ -1,4 +1,4 @@
-package tengo
+package z
 
 // Iterator represents an iterator for underlying data type.
 type Iterator interface {

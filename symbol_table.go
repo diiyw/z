@@ -1,4 +1,4 @@
-package tengo
+package z
 
 // SymbolScope represents a symbol scope.
 type SymbolScope string

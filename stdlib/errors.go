@@ -4,9 +4,9 @@ import (
 	"github.com/d5/tengo/v2"
 )
 
-func wrapError(err error) tengo.Object {
+func wrapError(err error) z.Object {
 	if err == nil {
-		return tengo.TrueValue
+		return z.TrueValue
 	}
-	return &tengo.Error{Value: &tengo.String{Value: err.Error()}}
+	return &z.Error{Value: &z.String{Value: err.Error()}}
 }

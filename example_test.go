@@ -1,4 +1,4 @@
-package tengo_test
+package z_test
 
 import (
 	"context"
@@ -22,7 +22,7 @@ each([a, b, c, d], func(x) {
 })`
 
 	// create a new Script instance
-	script := tengo.NewScript([]byte(src))
+	script := z.NewScript([]byte(src))
 
 	// set values
 	_ = script.Add("a", 1)

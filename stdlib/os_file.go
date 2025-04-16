@@ -6,64 +6,64 @@ import (
 	"github.com/d5/tengo/v2"
 )
 
-func makeOSFile(file *os.File) *tengo.ImmutableMap {
-	return &tengo.ImmutableMap{
-		Value: map[string]tengo.Object{
+func makeOSFile(file *os.File) *z.ImmutableMap {
+	return &z.ImmutableMap{
+		Value: map[string]z.Object{
 			// chdir() => true/error
-			"chdir": &tengo.UserFunction{
+			"chdir": &z.UserFunction{
 				Name:  "chdir",
 				Value: FuncARE(file.Chdir),
 			}, //
 			// chown(uid int, gid int) => true/error
-			"chown": &tengo.UserFunction{
+			"chown": &z.UserFunction{
 				Name:  "chown",
 				Value: FuncAIIRE(file.Chown),
 			}, //
 			// close() => error
-			"close": &tengo.UserFunction{
+			"close": &z.UserFunction{
 				Name:  "close",
 				Value: FuncARE(file.Close),
 			}, //
 			// name() => string
-			"name": &tengo.UserFunction{
+			"name": &z.UserFunction{
 				Name:  "name",
 				Value: FuncARS(file.Name),
 			}, //
 			// readdirnames(n int) => array(string)/error
-			"readdirnames": &tengo.UserFunction{
+			"readdirnames": &z.UserFunction{
 				Name:  "readdirnames",
 				Value: FuncAIRSsE(file.Readdirnames),
 			}, //
 			// sync() => error
-			"sync": &tengo.UserFunction{
+			"sync": &z.UserFunction{
 				Name:  "sync",
 				Value: FuncARE(file.Sync),
 			}, //
 			// write(bytes) => int/error
-			"write": &tengo.UserFunction{
+			"write": &z.UserFunction{
 				Name:  "write",
 				Value: FuncAYRIE(file.Write),
 			}, //
 			// write(string) => int/error
-			"write_string": &tengo.UserFunction{
+			"write_string": &z.UserFunction{
 				Name:  "write_string",
 				Value: FuncASRIE(file.WriteString),
 			}, //
 			// read(bytes) => int/error
-			"read": &tengo.UserFunction{
+			"read": &z.UserFunction{
 				Name:  "read",
 				Value: FuncAYRIE(file.Read),
 			}, //
 			// chmod(mode int) => error
-			"chmod": &tengo.UserFunction{
+			"chmod": &z.UserFunction{
 				Name: "chmod",
-				Value: func(args ...tengo.Object) (tengo.Object, error) {
+				Value: func(args ...z.Object) (z.Object, error) {
 					if len(args) != 1 {
-						return nil, tengo.ErrWrongNumArguments
+						return nil, z.ErrWrongNumArguments
 					}
-					i1, ok := tengo.ToInt64(args[0])
+					i1, ok := z.ToInt64(args[0])
 					if !ok {
-						return nil, tengo.ErrInvalidArgumentType{
+						return nil, z.ErrInvalidArgumentType{
 							Name:     "first",
 							Expected: "int(compatible)",
 							Found:    args[0].TypeName(),
@@ -73,23 +73,23 @@ func makeOSFile(file *os.File) *tengo.ImmutableMap {
 				},
 			},
 			// seek(offset int, whence int) => int/error
-			"seek": &tengo.UserFunction{
+			"seek": &z.UserFunction{
 				Name: "seek",
-				Value: func(args ...tengo.Object) (tengo.Object, error) {
+				Value: func(args ...z.Object) (z.Object, error) {
 					if len(args) != 2 {
-						return nil, tengo.ErrWrongNumArguments
+						return nil, z.ErrWrongNumArguments
 					}
-					i1, ok := tengo.ToInt64(args[0])
+					i1, ok := z.ToInt64(args[0])
 					if !ok {
-						return nil, tengo.ErrInvalidArgumentType{
+						return nil, z.ErrInvalidArgumentType{
 							Name:     "first",
 							Expected: "int(compatible)",
 							Found:    args[0].TypeName(),
 						}
 					}
-					i2, ok := tengo.ToInt(args[1])
+					i2, ok := z.ToInt(args[1])
 					if !ok {
-						return nil, tengo.ErrInvalidArgumentType{
+						return nil, z.ErrInvalidArgumentType{
 							Name:     "second",
 							Expected: "int(compatible)",
 							Found:    args[1].TypeName(),
@@ -99,17 +99,17 @@ func makeOSFile(file *os.File) *tengo.ImmutableMap {
 					if err != nil {
 						return wrapError(err), nil
 					}
-					return &tengo.Int{Value: res}, nil
+					return &z.Int{Value: res}, nil
 				},
 			},
 			// stat() => imap(fileinfo)/error
-			"stat": &tengo.UserFunction{
+			"stat": &z.UserFunction{
 				Name: "stat",
-				Value: func(args ...tengo.Object) (tengo.Object, error) {
+				Value: func(args ...z.Object) (z.Object, error) {
 					if len(args) != 0 {
-						return nil, tengo.ErrWrongNumArguments
+						return nil, z.ErrWrongNumArguments
 					}
-					return osStat(&tengo.String{Value: file.Name()})
+					return osStat(&z.String{Value: file.Name()})
 				},
 			},
 		},

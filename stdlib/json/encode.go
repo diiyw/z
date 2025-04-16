@@ -125,11 +125,11 @@ var safeSet = [utf8.RuneSelf]bool{
 var hex = "0123456789abcdef"
 
 // Encode returns the JSON encoding of the object.
-func Encode(o tengo.Object) ([]byte, error) {
+func Encode(o z.Object) ([]byte, error) {
 	var b []byte
 
 	switch o := o.(type) {
-	case *tengo.Array:
+	case *z.Array:
 		b = append(b, '[')
 		len1 := len(o.Value) - 1
 		for idx, elem := range o.Value {
@@ -143,7 +143,7 @@ func Encode(o tengo.Object) ([]byte, error) {
 			}
 		}
 		b = append(b, ']')
-	case *tengo.ImmutableArray:
+	case *z.ImmutableArray:
 		b = append(b, '[')
 		len1 := len(o.Value) - 1
 		for idx, elem := range o.Value {
@@ -157,7 +157,7 @@ func Encode(o tengo.Object) ([]byte, error) {
 			}
 		}
 		b = append(b, ']')
-	case *tengo.Map:
+	case *z.Map:
 		b = append(b, '{')
 		len1 := len(o.Value) - 1
 		idx := 0
@@ -175,7 +175,7 @@ func Encode(o tengo.Object) ([]byte, error) {
 			idx++
 		}
 		b = append(b, '}')
-	case *tengo.ImmutableMap:
+	case *z.ImmutableMap:
 		b = append(b, '{')
 		len1 := len(o.Value) - 1
 		idx := 0
@@ -193,22 +193,22 @@ func Encode(o tengo.Object) ([]byte, error) {
 			idx++
 		}
 		b = append(b, '}')
-	case *tengo.Bool:
+	case *z.Bool:
 		if o.IsFalsy() {
 			b = strconv.AppendBool(b, false)
 		} else {
 			b = strconv.AppendBool(b, true)
 		}
-	case *tengo.Bytes:
+	case *z.Bytes:
 		b = append(b, '"')
 		encodedLen := base64.StdEncoding.EncodedLen(len(o.Value))
 		dst := make([]byte, encodedLen)
 		base64.StdEncoding.Encode(dst, o.Value)
 		b = append(b, dst...)
 		b = append(b, '"')
-	case *tengo.Char:
+	case *z.Char:
 		b = strconv.AppendInt(b, int64(o.Value), 10)
-	case *tengo.Float:
+	case *z.Float:
 		var y []byte
 
 		f := o.Value
@@ -236,19 +236,19 @@ func Encode(o tengo.Object) ([]byte, error) {
 		}
 
 		b = append(b, y...)
-	case *tengo.Int:
+	case *z.Int:
 		b = strconv.AppendInt(b, o.Value, 10)
-	case *tengo.String:
+	case *z.String:
 		// string encoding bug is fixed with newly introduced function
 		// encodeString(). See: https://github.com/d5/tengo/issues/268
 		b = encodeString(b, o.Value)
-	case *tengo.Time:
+	case *z.Time:
 		y, err := o.Value.MarshalJSON()
 		if err != nil {
 			return nil, err
 		}
 		b = append(b, y...)
-	case *tengo.Undefined:
+	case *z.Undefined:
 		b = append(b, "null"...)
 	default:
 		// unknown type: ignore

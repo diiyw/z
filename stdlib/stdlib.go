@@ -20,8 +20,8 @@ func AllModuleNames() []string {
 
 // GetModuleMap returns the module map that includes all modules
 // for the given module names.
-func GetModuleMap(names ...string) *tengo.ModuleMap {
-	modules := tengo.NewModuleMap()
+func GetModuleMap(names ...string) *z.ModuleMap {
+	modules := z.NewModuleMap()
 	for _, name := range names {
 		if mod := BuiltinModules[name]; mod != nil {
 			modules.AddBuiltinModule(name, mod)

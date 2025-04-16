@@ -1,4 +1,4 @@
-package tengo
+package z
 
 // Importable interface represents importable module instance.
 type Importable interface {

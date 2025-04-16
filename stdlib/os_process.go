@@ -7,22 +7,22 @@ import (
 	"github.com/d5/tengo/v2"
 )
 
-func makeOSProcessState(state *os.ProcessState) *tengo.ImmutableMap {
-	return &tengo.ImmutableMap{
-		Value: map[string]tengo.Object{
-			"exited": &tengo.UserFunction{
+func makeOSProcessState(state *os.ProcessState) *z.ImmutableMap {
+	return &z.ImmutableMap{
+		Value: map[string]z.Object{
+			"exited": &z.UserFunction{
 				Name:  "exited",
 				Value: FuncARB(state.Exited),
 			},
-			"pid": &tengo.UserFunction{
+			"pid": &z.UserFunction{
 				Name:  "pid",
 				Value: FuncARI(state.Pid),
 			},
-			"string": &tengo.UserFunction{
+			"string": &z.UserFunction{
 				Name:  "string",
 				Value: FuncARS(state.String),
 			},
-			"success": &tengo.UserFunction{
+			"success": &z.UserFunction{
 				Name:  "success",
 				Value: FuncARB(state.Success),
 			},
@@ -30,26 +30,26 @@ func makeOSProcessState(state *os.ProcessState) *tengo.ImmutableMap {
 	}
 }
 
-func makeOSProcess(proc *os.Process) *tengo.ImmutableMap {
-	return &tengo.ImmutableMap{
-		Value: map[string]tengo.Object{
-			"kill": &tengo.UserFunction{
+func makeOSProcess(proc *os.Process) *z.ImmutableMap {
+	return &z.ImmutableMap{
+		Value: map[string]z.Object{
+			"kill": &z.UserFunction{
 				Name:  "kill",
 				Value: FuncARE(proc.Kill),
 			},
-			"release": &tengo.UserFunction{
+			"release": &z.UserFunction{
 				Name:  "release",
 				Value: FuncARE(proc.Release),
 			},
-			"signal": &tengo.UserFunction{
+			"signal": &z.UserFunction{
 				Name: "signal",
-				Value: func(args ...tengo.Object) (tengo.Object, error) {
+				Value: func(args ...z.Object) (z.Object, error) {
 					if len(args) != 1 {
-						return nil, tengo.ErrWrongNumArguments
+						return nil, z.ErrWrongNumArguments
 					}
-					i1, ok := tengo.ToInt64(args[0])
+					i1, ok := z.ToInt64(args[0])
 					if !ok {
-						return nil, tengo.ErrInvalidArgumentType{
+						return nil, z.ErrInvalidArgumentType{
 							Name:     "first",
 							Expected: "int(compatible)",
 							Found:    args[0].TypeName(),
@@ -58,11 +58,11 @@ func makeOSProcess(proc *os.Process) *tengo.ImmutableMap {
 					return wrapError(proc.Signal(syscall.Signal(i1))), nil
 				},
 			},
-			"wait": &tengo.UserFunction{
+			"wait": &z.UserFunction{
 				Name: "wait",
-				Value: func(args ...tengo.Object) (tengo.Object, error) {
+				Value: func(args ...z.Object) (z.Object, error) {
 					if len(args) != 0 {
-						return nil, tengo.ErrWrongNumArguments
+						return nil, z.ErrWrongNumArguments
 					}
 					state, err := proc.Wait()
 					if err != nil {

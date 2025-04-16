@@ -8,49 +8,49 @@ import (
 	"github.com/d5/tengo/v2/stdlib/json"
 )
 
-var jsonModule = map[string]tengo.Object{
-	"decode": &tengo.UserFunction{
+var jsonModule = map[string]z.Object{
+	"decode": &z.UserFunction{
 		Name:  "decode",
 		Value: jsonDecode,
 	},
-	"encode": &tengo.UserFunction{
+	"encode": &z.UserFunction{
 		Name:  "encode",
 		Value: jsonEncode,
 	},
-	"indent": &tengo.UserFunction{
+	"indent": &z.UserFunction{
 		Name:  "encode",
 		Value: jsonIndent,
 	},
-	"html_escape": &tengo.UserFunction{
+	"html_escape": &z.UserFunction{
 		Name:  "html_escape",
 		Value: jsonHTMLEscape,
 	},
 }
 
-func jsonDecode(args ...tengo.Object) (ret tengo.Object, err error) {
+func jsonDecode(args ...z.Object) (ret z.Object, err error) {
 	if len(args) != 1 {
-		return nil, tengo.ErrWrongNumArguments
+		return nil, z.ErrWrongNumArguments
 	}
 
 	switch o := args[0].(type) {
-	case *tengo.Bytes:
+	case *z.Bytes:
 		v, err := json.Decode(o.Value)
 		if err != nil {
-			return &tengo.Error{
-				Value: &tengo.String{Value: err.Error()},
+			return &z.Error{
+				Value: &z.String{Value: err.Error()},
 			}, nil
 		}
 		return v, nil
-	case *tengo.String:
+	case *z.String:
 		v, err := json.Decode([]byte(o.Value))
 		if err != nil {
-			return &tengo.Error{
-				Value: &tengo.String{Value: err.Error()},
+			return &z.Error{
+				Value: &z.String{Value: err.Error()},
 			}, nil
 		}
 		return v, nil
 	default:
-		return nil, tengo.ErrInvalidArgumentType{
+		return nil, z.ErrInvalidArgumentType{
 			Name:     "first",
 			Expected: "bytes/string",
 			Found:    args[0].TypeName(),
@@ -58,36 +58,36 @@ func jsonDecode(args ...tengo.Object) (ret tengo.Object, err error) {
 	}
 }
 
-func jsonEncode(args ...tengo.Object) (ret tengo.Object, err error) {
+func jsonEncode(args ...z.Object) (ret z.Object, err error) {
 	if len(args) != 1 {
-		return nil, tengo.ErrWrongNumArguments
+		return nil, z.ErrWrongNumArguments
 	}
 
 	b, err := json.Encode(args[0])
 	if err != nil {
-		return &tengo.Error{Value: &tengo.String{Value: err.Error()}}, nil
+		return &z.Error{Value: &z.String{Value: err.Error()}}, nil
 	}
 
-	return &tengo.Bytes{Value: b}, nil
+	return &z.Bytes{Value: b}, nil
 }
 
-func jsonIndent(args ...tengo.Object) (ret tengo.Object, err error) {
+func jsonIndent(args ...z.Object) (ret z.Object, err error) {
 	if len(args) != 3 {
-		return nil, tengo.ErrWrongNumArguments
+		return nil, z.ErrWrongNumArguments
 	}
 
-	prefix, ok := tengo.ToString(args[1])
+	prefix, ok := z.ToString(args[1])
 	if !ok {
-		return nil, tengo.ErrInvalidArgumentType{
+		return nil, z.ErrInvalidArgumentType{
 			Name:     "prefix",
 			Expected: "string(compatible)",
 			Found:    args[1].TypeName(),
 		}
 	}
 
-	indent, ok := tengo.ToString(args[2])
+	indent, ok := z.ToString(args[2])
 	if !ok {
-		return nil, tengo.ErrInvalidArgumentType{
+		return nil, z.ErrInvalidArgumentType{
 			Name:     "indent",
 			Expected: "string(compatible)",
 			Found:    args[2].TypeName(),
@@ -95,26 +95,26 @@ func jsonIndent(args ...tengo.Object) (ret tengo.Object, err error) {
 	}
 
 	switch o := args[0].(type) {
-	case *tengo.Bytes:
+	case *z.Bytes:
 		var dst bytes.Buffer
 		err := gojson.Indent(&dst, o.Value, prefix, indent)
 		if err != nil {
-			return &tengo.Error{
-				Value: &tengo.String{Value: err.Error()},
+			return &z.Error{
+				Value: &z.String{Value: err.Error()},
 			}, nil
 		}
-		return &tengo.Bytes{Value: dst.Bytes()}, nil
-	case *tengo.String:
+		return &z.Bytes{Value: dst.Bytes()}, nil
+	case *z.String:
 		var dst bytes.Buffer
 		err := gojson.Indent(&dst, []byte(o.Value), prefix, indent)
 		if err != nil {
-			return &tengo.Error{
-				Value: &tengo.String{Value: err.Error()},
+			return &z.Error{
+				Value: &z.String{Value: err.Error()},
 			}, nil
 		}
-		return &tengo.Bytes{Value: dst.Bytes()}, nil
+		return &z.Bytes{Value: dst.Bytes()}, nil
 	default:
-		return nil, tengo.ErrInvalidArgumentType{
+		return nil, z.ErrInvalidArgumentType{
 			Name:     "first",
 			Expected: "bytes/string",
 			Found:    args[0].TypeName(),
@@ -122,22 +122,22 @@ func jsonIndent(args ...tengo.Object) (ret tengo.Object, err error) {
 	}
 }
 
-func jsonHTMLEscape(args ...tengo.Object) (ret tengo.Object, err error) {
+func jsonHTMLEscape(args ...z.Object) (ret z.Object, err error) {
 	if len(args) != 1 {
-		return nil, tengo.ErrWrongNumArguments
+		return nil, z.ErrWrongNumArguments
 	}
 
 	switch o := args[0].(type) {
-	case *tengo.Bytes:
+	case *z.Bytes:
 		var dst bytes.Buffer
 		gojson.HTMLEscape(&dst, o.Value)
-		return &tengo.Bytes{Value: dst.Bytes()}, nil
-	case *tengo.String:
+		return &z.Bytes{Value: dst.Bytes()}, nil
+	case *z.String:
 		var dst bytes.Buffer
 		gojson.HTMLEscape(&dst, []byte(o.Value))
-		return &tengo.Bytes{Value: dst.Bytes()}, nil
+		return &z.Bytes{Value: dst.Bytes()}, nil
 	default:
-		return nil, tengo.ErrInvalidArgumentType{
+		return nil, z.ErrInvalidArgumentType{
 			Name:     "first",
 			Expected: "bytes/string",
 			Found:    args[0].TypeName(),

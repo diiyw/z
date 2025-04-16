@@ -1,4 +1,4 @@
-package tengo_test
+package z_test
 
 import (
 	"testing"
@@ -93,37 +93,37 @@ func TestSymbolTable(t *testing.T) {
 
 func symbol(
 	name string,
-	scope tengo.SymbolScope,
+	scope z.SymbolScope,
 	index int,
-) *tengo.Symbol {
-	return &tengo.Symbol{
+) *z.Symbol {
+	return &z.Symbol{
 		Name:  name,
 		Scope: scope,
 		Index: index,
 	}
 }
 
-func globalSymbol(name string, index int) *tengo.Symbol {
-	return symbol(name, tengo.ScopeGlobal, index)
+func globalSymbol(name string, index int) *z.Symbol {
+	return symbol(name, z.ScopeGlobal, index)
 }
 
-func localSymbol(name string, index int) *tengo.Symbol {
-	return symbol(name, tengo.ScopeLocal, index)
+func localSymbol(name string, index int) *z.Symbol {
+	return symbol(name, z.ScopeLocal, index)
 }
 
-func freeSymbol(name string, index int) *tengo.Symbol {
-	return symbol(name, tengo.ScopeFree, index)
+func freeSymbol(name string, index int) *z.Symbol {
+	return symbol(name, z.ScopeFree, index)
 }
 
-func symbolTable() *tengo.SymbolTable {
-	return tengo.NewSymbolTable()
+func symbolTable() *z.SymbolTable {
+	return z.NewSymbolTable()
 }
 
 func resolveExpect(
 	t *testing.T,
-	symbolTable *tengo.SymbolTable,
+	symbolTable *z.SymbolTable,
 	name string,
-	expectedSymbol *tengo.Symbol,
+	expectedSymbol *z.Symbol,
 	expectedDepth int,
 ) {
 	actualSymbol, actualDepth, ok := symbolTable.Resolve(name, true)

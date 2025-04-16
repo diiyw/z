@@ -1,4 +1,4 @@
-package tengo_test
+package z_test
 
 import (
 	"testing"
@@ -17,7 +17,7 @@ type VariableTest struct {
 	CharValue   rune
 	BoolValue   bool
 	StringValue string
-	Object      tengo.Object
+	Object      z.Object
 	IsUndefined bool
 }
 
@@ -33,7 +33,7 @@ func TestVariable(t *testing.T) {
 			CharValue:   rune(1),
 			BoolValue:   true,
 			StringValue: "1",
-			Object:      &tengo.Int{Value: 1},
+			Object:      &z.Int{Value: 1},
 		},
 		{
 			Name:        "b",
@@ -42,7 +42,7 @@ func TestVariable(t *testing.T) {
 			FloatValue:  52.11,
 			StringValue: "52.11",
 			BoolValue:   true,
-			Object:      &tengo.String{Value: "52.11"},
+			Object:      &z.String{Value: "52.11"},
 		},
 		{
 			Name:        "c",
@@ -53,19 +53,19 @@ func TestVariable(t *testing.T) {
 			FloatValue:  0,
 			BoolValue:   true,
 			StringValue: "true",
-			Object:      tengo.TrueValue,
+			Object:      z.TrueValue,
 		},
 		{
 			Name:        "d",
 			Value:       nil,
 			ValueType:   "undefined",
-			Object:      tengo.UndefinedValue,
+			Object:      z.UndefinedValue,
 			IsUndefined: true,
 		},
 	}
 
 	for _, tc := range vars {
-		v, err := tengo.NewVariable(tc.Name, tc.Value)
+		v, err := z.NewVariable(tc.Name, tc.Value)
 		require.NoError(t, err)
 		require.Equal(t, tc.Value, v.Value(), "Name: %s", tc.Name)
 		require.Equal(t, tc.ValueType, v.ValueType(), "Name: %s", tc.Name)

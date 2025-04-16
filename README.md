@@ -1,12 +1,12 @@
-# The Tengo Language
+# The Z Language
 
 [![GoDoc](https://godoc.org/github.com/d5/tengo/v2?status.svg)](https://godoc.org/github.com/d5/tengo/v2)
 ![test](https://github.com/d5/tengo/workflows/test/badge.svg)
 [![Go Report Card](https://goreportcard.com/badge/github.com/d5/tengo)](https://goreportcard.com/report/github.com/d5/tengo)
 
-**Tengo is a small, dynamic, fast, secure script language for Go.** 
+**Z is a small, dynamic, fast, secure script language for Go.** 
 
-Tengo is **[fast](#benchmark)** and secure because it's compiled/executed as
+Z is **[fast](#benchmark)** and secure because it's compiled/executed as
 bytecode on stack-based VM that's written in native Go.
 
 ```golang

@@ -7,99 +7,99 @@ import (
 )
 
 // FuncAR transform a function of 'func()' signature into CallableFunc type.
-func FuncAR(fn func()) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAR(fn func()) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 0 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
 		fn()
-		return tengo.UndefinedValue, nil
+		return z.UndefinedValue, nil
 	}
 }
 
 // FuncARI transform a function of 'func() int' signature into CallableFunc
 // type.
-func FuncARI(fn func() int) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncARI(fn func() int) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 0 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		return &tengo.Int{Value: int64(fn())}, nil
+		return &z.Int{Value: int64(fn())}, nil
 	}
 }
 
 // FuncARI64 transform a function of 'func() int64' signature into CallableFunc
 // type.
-func FuncARI64(fn func() int64) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncARI64(fn func() int64) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 0 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		return &tengo.Int{Value: fn()}, nil
+		return &z.Int{Value: fn()}, nil
 	}
 }
 
 // FuncAI64RI64 transform a function of 'func(int64) int64' signature into
 // CallableFunc type.
-func FuncAI64RI64(fn func(int64) int64) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAI64RI64(fn func(int64) int64) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
 
-		i1, ok := tengo.ToInt64(args[0])
+		i1, ok := z.ToInt64(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "int(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		return &tengo.Int{Value: fn(i1)}, nil
+		return &z.Int{Value: fn(i1)}, nil
 	}
 }
 
 // FuncAI64R transform a function of 'func(int64)' signature into CallableFunc
 // type.
-func FuncAI64R(fn func(int64)) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAI64R(fn func(int64)) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
 
-		i1, ok := tengo.ToInt64(args[0])
+		i1, ok := z.ToInt64(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "int(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
 		fn(i1)
-		return tengo.UndefinedValue, nil
+		return z.UndefinedValue, nil
 	}
 }
 
 // FuncARB transform a function of 'func() bool' signature into CallableFunc
 // type.
-func FuncARB(fn func() bool) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncARB(fn func() bool) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 0 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
 		if fn() {
-			return tengo.TrueValue, nil
+			return z.TrueValue, nil
 		}
-		return tengo.FalseValue, nil
+		return z.FalseValue, nil
 	}
 }
 
 // FuncARE transform a function of 'func() error' signature into CallableFunc
 // type.
-func FuncARE(fn func() error) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncARE(fn func() error) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 0 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
 		return wrapError(fn()), nil
 	}
@@ -107,79 +107,79 @@ func FuncARE(fn func() error) tengo.CallableFunc {
 
 // FuncARS transform a function of 'func() string' signature into CallableFunc
 // type.
-func FuncARS(fn func() string) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncARS(fn func() string) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 0 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
 		s := fn()
-		if len(s) > tengo.MaxStringLen {
-			return nil, tengo.ErrStringLimit
+		if len(s) > z.MaxStringLen {
+			return nil, z.ErrStringLimit
 		}
-		return &tengo.String{Value: s}, nil
+		return &z.String{Value: s}, nil
 	}
 }
 
 // FuncARSE transform a function of 'func() (string, error)' signature into
 // CallableFunc type.
-func FuncARSE(fn func() (string, error)) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncARSE(fn func() (string, error)) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 0 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
 		res, err := fn()
 		if err != nil {
 			return wrapError(err), nil
 		}
-		if len(res) > tengo.MaxStringLen {
-			return nil, tengo.ErrStringLimit
+		if len(res) > z.MaxStringLen {
+			return nil, z.ErrStringLimit
 		}
-		return &tengo.String{Value: res}, nil
+		return &z.String{Value: res}, nil
 	}
 }
 
 // FuncARYE transform a function of 'func() ([]byte, error)' signature into
 // CallableFunc type.
-func FuncARYE(fn func() ([]byte, error)) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncARYE(fn func() ([]byte, error)) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 0 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
 		res, err := fn()
 		if err != nil {
 			return wrapError(err), nil
 		}
-		if len(res) > tengo.MaxBytesLen {
-			return nil, tengo.ErrBytesLimit
+		if len(res) > z.MaxBytesLen {
+			return nil, z.ErrBytesLimit
 		}
-		return &tengo.Bytes{Value: res}, nil
+		return &z.Bytes{Value: res}, nil
 	}
 }
 
 // FuncARF transform a function of 'func() float64' signature into CallableFunc
 // type.
-func FuncARF(fn func() float64) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncARF(fn func() float64) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 0 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		return &tengo.Float{Value: fn()}, nil
+		return &z.Float{Value: fn()}, nil
 	}
 }
 
 // FuncARSs transform a function of 'func() []string' signature into
 // CallableFunc type.
-func FuncARSs(fn func() []string) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncARSs(fn func() []string) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 0 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		arr := &tengo.Array{}
+		arr := &z.Array{}
 		for _, elem := range fn() {
-			if len(elem) > tengo.MaxStringLen {
-				return nil, tengo.ErrStringLimit
+			if len(elem) > z.MaxStringLen {
+				return nil, z.ErrStringLimit
 			}
-			arr.Value = append(arr.Value, &tengo.String{Value: elem})
+			arr.Value = append(arr.Value, &z.String{Value: elem})
 		}
 		return arr, nil
 	}
@@ -187,18 +187,18 @@ func FuncARSs(fn func() []string) tengo.CallableFunc {
 
 // FuncARIsE transform a function of 'func() ([]int, error)' signature into
 // CallableFunc type.
-func FuncARIsE(fn func() ([]int, error)) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncARIsE(fn func() ([]int, error)) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 0 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
 		res, err := fn()
 		if err != nil {
 			return wrapError(err), nil
 		}
-		arr := &tengo.Array{}
+		arr := &z.Array{}
 		for _, v := range res {
-			arr.Value = append(arr.Value, &tengo.Int{Value: int64(v)})
+			arr.Value = append(arr.Value, &z.Int{Value: int64(v)})
 		}
 		return arr, nil
 	}
@@ -206,23 +206,23 @@ func FuncARIsE(fn func() ([]int, error)) tengo.CallableFunc {
 
 // FuncAIRIs transform a function of 'func(int) []int' signature into
 // CallableFunc type.
-func FuncAIRIs(fn func(int) []int) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAIRIs(fn func(int) []int) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		i1, ok := tengo.ToInt(args[0])
+		i1, ok := z.ToInt(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "int(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
 		res := fn(i1)
-		arr := &tengo.Array{}
+		arr := &z.Array{}
 		for _, v := range res {
-			arr.Value = append(arr.Value, &tengo.Int{Value: int64(v)})
+			arr.Value = append(arr.Value, &z.Int{Value: int64(v)})
 		}
 		return arr, nil
 	}
@@ -230,259 +230,259 @@ func FuncAIRIs(fn func(int) []int) tengo.CallableFunc {
 
 // FuncAFRF transform a function of 'func(float64) float64' signature into
 // CallableFunc type.
-func FuncAFRF(fn func(float64) float64) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAFRF(fn func(float64) float64) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		f1, ok := tengo.ToFloat64(args[0])
+		f1, ok := z.ToFloat64(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "float(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		return &tengo.Float{Value: fn(f1)}, nil
+		return &z.Float{Value: fn(f1)}, nil
 	}
 }
 
 // FuncAIR transform a function of 'func(int)' signature into CallableFunc type.
-func FuncAIR(fn func(int)) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAIR(fn func(int)) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		i1, ok := tengo.ToInt(args[0])
+		i1, ok := z.ToInt(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "int(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
 		fn(i1)
-		return tengo.UndefinedValue, nil
+		return z.UndefinedValue, nil
 	}
 }
 
 // FuncAIRF transform a function of 'func(int) float64' signature into
 // CallableFunc type.
-func FuncAIRF(fn func(int) float64) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAIRF(fn func(int) float64) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		i1, ok := tengo.ToInt(args[0])
+		i1, ok := z.ToInt(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "int(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		return &tengo.Float{Value: fn(i1)}, nil
+		return &z.Float{Value: fn(i1)}, nil
 	}
 }
 
 // FuncAFRI transform a function of 'func(float64) int' signature into
 // CallableFunc type.
-func FuncAFRI(fn func(float64) int) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAFRI(fn func(float64) int) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		f1, ok := tengo.ToFloat64(args[0])
+		f1, ok := z.ToFloat64(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "float(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		return &tengo.Int{Value: int64(fn(f1))}, nil
+		return &z.Int{Value: int64(fn(f1))}, nil
 	}
 }
 
 // FuncAFFRF transform a function of 'func(float64, float64) float64' signature
 // into CallableFunc type.
-func FuncAFFRF(fn func(float64, float64) float64) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAFFRF(fn func(float64, float64) float64) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		f1, ok := tengo.ToFloat64(args[0])
+		f1, ok := z.ToFloat64(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "float(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		f2, ok := tengo.ToFloat64(args[1])
+		f2, ok := z.ToFloat64(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "float(compatible)",
 				Found:    args[1].TypeName(),
 			}
 		}
-		return &tengo.Float{Value: fn(f1, f2)}, nil
+		return &z.Float{Value: fn(f1, f2)}, nil
 	}
 }
 
 // FuncAIFRF transform a function of 'func(int, float64) float64' signature
 // into CallableFunc type.
-func FuncAIFRF(fn func(int, float64) float64) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAIFRF(fn func(int, float64) float64) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		i1, ok := tengo.ToInt(args[0])
+		i1, ok := z.ToInt(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "int(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		f2, ok := tengo.ToFloat64(args[1])
+		f2, ok := z.ToFloat64(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "float(compatible)",
 				Found:    args[1].TypeName(),
 			}
 		}
-		return &tengo.Float{Value: fn(i1, f2)}, nil
+		return &z.Float{Value: fn(i1, f2)}, nil
 	}
 }
 
 // FuncAFIRF transform a function of 'func(float64, int) float64' signature
 // into CallableFunc type.
-func FuncAFIRF(fn func(float64, int) float64) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAFIRF(fn func(float64, int) float64) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		f1, ok := tengo.ToFloat64(args[0])
+		f1, ok := z.ToFloat64(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "float(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		i2, ok := tengo.ToInt(args[1])
+		i2, ok := z.ToInt(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "int(compatible)",
 				Found:    args[1].TypeName(),
 			}
 		}
-		return &tengo.Float{Value: fn(f1, i2)}, nil
+		return &z.Float{Value: fn(f1, i2)}, nil
 	}
 }
 
 // FuncAFIRB transform a function of 'func(float64, int) bool' signature
 // into CallableFunc type.
-func FuncAFIRB(fn func(float64, int) bool) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAFIRB(fn func(float64, int) bool) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		f1, ok := tengo.ToFloat64(args[0])
+		f1, ok := z.ToFloat64(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "float(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		i2, ok := tengo.ToInt(args[1])
+		i2, ok := z.ToInt(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "int(compatible)",
 				Found:    args[1].TypeName(),
 			}
 		}
 		if fn(f1, i2) {
-			return tengo.TrueValue, nil
+			return z.TrueValue, nil
 		}
-		return tengo.FalseValue, nil
+		return z.FalseValue, nil
 	}
 }
 
 // FuncAFRB transform a function of 'func(float64) bool' signature
 // into CallableFunc type.
-func FuncAFRB(fn func(float64) bool) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAFRB(fn func(float64) bool) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		f1, ok := tengo.ToFloat64(args[0])
+		f1, ok := z.ToFloat64(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "float(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
 		if fn(f1) {
-			return tengo.TrueValue, nil
+			return z.TrueValue, nil
 		}
-		return tengo.FalseValue, nil
+		return z.FalseValue, nil
 	}
 }
 
 // FuncASRS transform a function of 'func(string) string' signature into
 // CallableFunc type. User function will return 'true' if underlying native
 // function returns nil.
-func FuncASRS(fn func(string) string) tengo.CallableFunc {
-	return func(args ...tengo.Object) (tengo.Object, error) {
+func FuncASRS(fn func(string) string) z.CallableFunc {
+	return func(args ...z.Object) (z.Object, error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
 		s := fn(s1)
-		if len(s) > tengo.MaxStringLen {
-			return nil, tengo.ErrStringLimit
+		if len(s) > z.MaxStringLen {
+			return nil, z.ErrStringLimit
 		}
-		return &tengo.String{Value: s}, nil
+		return &z.String{Value: s}, nil
 	}
 }
 
 // FuncASRSs transform a function of 'func(string) []string' signature into
 // CallableFunc type.
-func FuncASRSs(fn func(string) []string) tengo.CallableFunc {
-	return func(args ...tengo.Object) (tengo.Object, error) {
+func FuncASRSs(fn func(string) []string) z.CallableFunc {
+	return func(args ...z.Object) (z.Object, error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
 		res := fn(s1)
-		arr := &tengo.Array{}
+		arr := &z.Array{}
 		for _, elem := range res {
-			if len(elem) > tengo.MaxStringLen {
-				return nil, tengo.ErrStringLimit
+			if len(elem) > z.MaxStringLen {
+				return nil, z.ErrStringLimit
 			}
-			arr.Value = append(arr.Value, &tengo.String{Value: elem})
+			arr.Value = append(arr.Value, &z.String{Value: elem})
 		}
 		return arr, nil
 	}
@@ -491,14 +491,14 @@ func FuncASRSs(fn func(string) []string) tengo.CallableFunc {
 // FuncASRSE transform a function of 'func(string) (string, error)' signature
 // into CallableFunc type. User function will return 'true' if underlying
 // native function returns nil.
-func FuncASRSE(fn func(string) (string, error)) tengo.CallableFunc {
-	return func(args ...tengo.Object) (tengo.Object, error) {
+func FuncASRSE(fn func(string) (string, error)) z.CallableFunc {
+	return func(args ...z.Object) (z.Object, error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
@@ -508,24 +508,24 @@ func FuncASRSE(fn func(string) (string, error)) tengo.CallableFunc {
 		if err != nil {
 			return wrapError(err), nil
 		}
-		if len(res) > tengo.MaxStringLen {
-			return nil, tengo.ErrStringLimit
+		if len(res) > z.MaxStringLen {
+			return nil, z.ErrStringLimit
 		}
-		return &tengo.String{Value: res}, nil
+		return &z.String{Value: res}, nil
 	}
 }
 
 // FuncASRE transform a function of 'func(string) error' signature into
 // CallableFunc type. User function will return 'true' if underlying native
 // function returns nil.
-func FuncASRE(fn func(string) error) tengo.CallableFunc {
-	return func(args ...tengo.Object) (tengo.Object, error) {
+func FuncASRE(fn func(string) error) z.CallableFunc {
+	return func(args ...z.Object) (z.Object, error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
@@ -538,22 +538,22 @@ func FuncASRE(fn func(string) error) tengo.CallableFunc {
 // FuncASSRE transform a function of 'func(string, string) error' signature
 // into CallableFunc type. User function will return 'true' if underlying
 // native function returns nil.
-func FuncASSRE(fn func(string, string) error) tengo.CallableFunc {
-	return func(args ...tengo.Object) (tengo.Object, error) {
+func FuncASSRE(fn func(string, string) error) z.CallableFunc {
+	return func(args ...z.Object) (z.Object, error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		s2, ok := tengo.ToString(args[1])
+		s2, ok := z.ToString(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "string(compatible)",
 				Found:    args[1].TypeName(),
@@ -565,33 +565,33 @@ func FuncASSRE(fn func(string, string) error) tengo.CallableFunc {
 
 // FuncASSRSs transform a function of 'func(string, string) []string'
 // signature into CallableFunc type.
-func FuncASSRSs(fn func(string, string) []string) tengo.CallableFunc {
-	return func(args ...tengo.Object) (tengo.Object, error) {
+func FuncASSRSs(fn func(string, string) []string) z.CallableFunc {
+	return func(args ...z.Object) (z.Object, error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		s2, ok := tengo.ToString(args[1])
+		s2, ok := z.ToString(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[1].TypeName(),
 			}
 		}
-		arr := &tengo.Array{}
+		arr := &z.Array{}
 		for _, res := range fn(s1, s2) {
-			if len(res) > tengo.MaxStringLen {
-				return nil, tengo.ErrStringLimit
+			if len(res) > z.MaxStringLen {
+				return nil, z.ErrStringLimit
 			}
-			arr.Value = append(arr.Value, &tengo.String{Value: res})
+			arr.Value = append(arr.Value, &z.String{Value: res})
 		}
 		return arr, nil
 	}
@@ -599,41 +599,41 @@ func FuncASSRSs(fn func(string, string) []string) tengo.CallableFunc {
 
 // FuncASSIRSs transform a function of 'func(string, string, int) []string'
 // signature into CallableFunc type.
-func FuncASSIRSs(fn func(string, string, int) []string) tengo.CallableFunc {
-	return func(args ...tengo.Object) (tengo.Object, error) {
+func FuncASSIRSs(fn func(string, string, int) []string) z.CallableFunc {
+	return func(args ...z.Object) (z.Object, error) {
 		if len(args) != 3 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		s2, ok := tengo.ToString(args[1])
+		s2, ok := z.ToString(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "string(compatible)",
 				Found:    args[1].TypeName(),
 			}
 		}
-		i3, ok := tengo.ToInt(args[2])
+		i3, ok := z.ToInt(args[2])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "third",
 				Expected: "int(compatible)",
 				Found:    args[2].TypeName(),
 			}
 		}
-		arr := &tengo.Array{}
+		arr := &z.Array{}
 		for _, res := range fn(s1, s2, i3) {
-			if len(res) > tengo.MaxStringLen {
-				return nil, tengo.ErrStringLimit
+			if len(res) > z.MaxStringLen {
+				return nil, z.ErrStringLimit
 			}
-			arr.Value = append(arr.Value, &tengo.String{Value: res})
+			arr.Value = append(arr.Value, &z.String{Value: res})
 		}
 		return arr, nil
 	}
@@ -641,106 +641,106 @@ func FuncASSIRSs(fn func(string, string, int) []string) tengo.CallableFunc {
 
 // FuncASSRI transform a function of 'func(string, string) int' signature into
 // CallableFunc type.
-func FuncASSRI(fn func(string, string) int) tengo.CallableFunc {
-	return func(args ...tengo.Object) (tengo.Object, error) {
+func FuncASSRI(fn func(string, string) int) z.CallableFunc {
+	return func(args ...z.Object) (z.Object, error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		s2, ok := tengo.ToString(args[1])
+		s2, ok := z.ToString(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		return &tengo.Int{Value: int64(fn(s1, s2))}, nil
+		return &z.Int{Value: int64(fn(s1, s2))}, nil
 	}
 }
 
 // FuncASSRS transform a function of 'func(string, string) string' signature
 // into CallableFunc type.
-func FuncASSRS(fn func(string, string) string) tengo.CallableFunc {
-	return func(args ...tengo.Object) (tengo.Object, error) {
+func FuncASSRS(fn func(string, string) string) z.CallableFunc {
+	return func(args ...z.Object) (z.Object, error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		s2, ok := tengo.ToString(args[1])
+		s2, ok := z.ToString(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "string(compatible)",
 				Found:    args[1].TypeName(),
 			}
 		}
 		s := fn(s1, s2)
-		if len(s) > tengo.MaxStringLen {
-			return nil, tengo.ErrStringLimit
+		if len(s) > z.MaxStringLen {
+			return nil, z.ErrStringLimit
 		}
-		return &tengo.String{Value: s}, nil
+		return &z.String{Value: s}, nil
 	}
 }
 
 // FuncASSRB transform a function of 'func(string, string) bool' signature
 // into CallableFunc type.
-func FuncASSRB(fn func(string, string) bool) tengo.CallableFunc {
-	return func(args ...tengo.Object) (tengo.Object, error) {
+func FuncASSRB(fn func(string, string) bool) z.CallableFunc {
+	return func(args ...z.Object) (z.Object, error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		s2, ok := tengo.ToString(args[1])
+		s2, ok := z.ToString(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "string(compatible)",
 				Found:    args[1].TypeName(),
 			}
 		}
 		if fn(s1, s2) {
-			return tengo.TrueValue, nil
+			return z.TrueValue, nil
 		}
-		return tengo.FalseValue, nil
+		return z.FalseValue, nil
 	}
 }
 
 // FuncASsSRS transform a function of 'func([]string, string) string' signature
 // into CallableFunc type.
-func FuncASsSRS(fn func([]string, string) string) tengo.CallableFunc {
-	return func(args ...tengo.Object) (tengo.Object, error) {
+func FuncASsSRS(fn func([]string, string) string) z.CallableFunc {
+	return func(args ...z.Object) (z.Object, error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
 		var ss1 []string
 		switch arg0 := args[0].(type) {
-		case *tengo.Array:
+		case *z.Array:
 			for idx, a := range arg0.Value {
-				as, ok := tengo.ToString(a)
+				as, ok := z.ToString(a)
 				if !ok {
-					return nil, tengo.ErrInvalidArgumentType{
+					return nil, z.ErrInvalidArgumentType{
 						Name:     fmt.Sprintf("first[%d]", idx),
 						Expected: "string(compatible)",
 						Found:    a.TypeName(),
@@ -748,11 +748,11 @@ func FuncASsSRS(fn func([]string, string) string) tengo.CallableFunc {
 				}
 				ss1 = append(ss1, as)
 			}
-		case *tengo.ImmutableArray:
+		case *z.ImmutableArray:
 			for idx, a := range arg0.Value {
-				as, ok := tengo.ToString(a)
+				as, ok := z.ToString(a)
 				if !ok {
-					return nil, tengo.ErrInvalidArgumentType{
+					return nil, z.ErrInvalidArgumentType{
 						Name:     fmt.Sprintf("first[%d]", idx),
 						Expected: "string(compatible)",
 						Found:    a.TypeName(),
@@ -761,46 +761,46 @@ func FuncASsSRS(fn func([]string, string) string) tengo.CallableFunc {
 				ss1 = append(ss1, as)
 			}
 		default:
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "array",
 				Found:    args[0].TypeName(),
 			}
 		}
-		s2, ok := tengo.ToString(args[1])
+		s2, ok := z.ToString(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "string(compatible)",
 				Found:    args[1].TypeName(),
 			}
 		}
 		s := fn(ss1, s2)
-		if len(s) > tengo.MaxStringLen {
-			return nil, tengo.ErrStringLimit
+		if len(s) > z.MaxStringLen {
+			return nil, z.ErrStringLimit
 		}
-		return &tengo.String{Value: s}, nil
+		return &z.String{Value: s}, nil
 	}
 }
 
 // FuncASI64RE transform a function of 'func(string, int64) error' signature
 // into CallableFunc type.
-func FuncASI64RE(fn func(string, int64) error) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncASI64RE(fn func(string, int64) error) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		i2, ok := tengo.ToInt64(args[1])
+		i2, ok := z.ToInt64(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "int(compatible)",
 				Found:    args[1].TypeName(),
@@ -812,22 +812,22 @@ func FuncASI64RE(fn func(string, int64) error) tengo.CallableFunc {
 
 // FuncAIIRE transform a function of 'func(int, int) error' signature
 // into CallableFunc type.
-func FuncAIIRE(fn func(int, int) error) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAIIRE(fn func(int, int) error) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		i1, ok := tengo.ToInt(args[0])
+		i1, ok := z.ToInt(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "int(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		i2, ok := tengo.ToInt(args[1])
+		i2, ok := z.ToInt(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "int(compatible)",
 				Found:    args[1].TypeName(),
@@ -839,61 +839,61 @@ func FuncAIIRE(fn func(int, int) error) tengo.CallableFunc {
 
 // FuncASIRS transform a function of 'func(string, int) string' signature
 // into CallableFunc type.
-func FuncASIRS(fn func(string, int) string) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncASIRS(fn func(string, int) string) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 2 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		i2, ok := tengo.ToInt(args[1])
+		i2, ok := z.ToInt(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "int(compatible)",
 				Found:    args[1].TypeName(),
 			}
 		}
 		s := fn(s1, i2)
-		if len(s) > tengo.MaxStringLen {
-			return nil, tengo.ErrStringLimit
+		if len(s) > z.MaxStringLen {
+			return nil, z.ErrStringLimit
 		}
-		return &tengo.String{Value: s}, nil
+		return &z.String{Value: s}, nil
 	}
 }
 
 // FuncASIIRE transform a function of 'func(string, int, int) error' signature
 // into CallableFunc type.
-func FuncASIIRE(fn func(string, int, int) error) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncASIIRE(fn func(string, int, int) error) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 3 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
-		i2, ok := tengo.ToInt(args[1])
+		i2, ok := z.ToInt(args[1])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "second",
 				Expected: "int(compatible)",
 				Found:    args[1].TypeName(),
 			}
 		}
-		i3, ok := tengo.ToInt(args[2])
+		i3, ok := z.ToInt(args[2])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "third",
 				Expected: "int(compatible)",
 				Found:    args[2].TypeName(),
@@ -905,14 +905,14 @@ func FuncASIIRE(fn func(string, int, int) error) tengo.CallableFunc {
 
 // FuncAYRIE transform a function of 'func([]byte) (int, error)' signature
 // into CallableFunc type.
-func FuncAYRIE(fn func([]byte) (int, error)) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAYRIE(fn func([]byte) (int, error)) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		y1, ok := tengo.ToByteSlice(args[0])
+		y1, ok := z.ToByteSlice(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "bytes(compatible)",
 				Found:    args[0].TypeName(),
@@ -922,40 +922,40 @@ func FuncAYRIE(fn func([]byte) (int, error)) tengo.CallableFunc {
 		if err != nil {
 			return wrapError(err), nil
 		}
-		return &tengo.Int{Value: int64(res)}, nil
+		return &z.Int{Value: int64(res)}, nil
 	}
 }
 
 // FuncAYRS transform a function of 'func([]byte) string' signature into
 // CallableFunc type.
-func FuncAYRS(fn func([]byte) string) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAYRS(fn func([]byte) string) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		y1, ok := tengo.ToByteSlice(args[0])
+		y1, ok := z.ToByteSlice(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "bytes(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
 		res := fn(y1)
-		return &tengo.String{Value: res}, nil
+		return &z.String{Value: res}, nil
 	}
 }
 
 // FuncASRIE transform a function of 'func(string) (int, error)' signature
 // into CallableFunc type.
-func FuncASRIE(fn func(string) (int, error)) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncASRIE(fn func(string) (int, error)) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
@@ -965,20 +965,20 @@ func FuncASRIE(fn func(string) (int, error)) tengo.CallableFunc {
 		if err != nil {
 			return wrapError(err), nil
 		}
-		return &tengo.Int{Value: int64(res)}, nil
+		return &z.Int{Value: int64(res)}, nil
 	}
 }
 
 // FuncASRYE transform a function of 'func(string) ([]byte, error)' signature
 // into CallableFunc type.
-func FuncASRYE(fn func(string) ([]byte, error)) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncASRYE(fn func(string) ([]byte, error)) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		s1, ok := tengo.ToString(args[0])
+		s1, ok := z.ToString(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "string(compatible)",
 				Found:    args[0].TypeName(),
@@ -988,23 +988,23 @@ func FuncASRYE(fn func(string) ([]byte, error)) tengo.CallableFunc {
 		if err != nil {
 			return wrapError(err), nil
 		}
-		if len(res) > tengo.MaxBytesLen {
-			return nil, tengo.ErrBytesLimit
+		if len(res) > z.MaxBytesLen {
+			return nil, z.ErrBytesLimit
 		}
-		return &tengo.Bytes{Value: res}, nil
+		return &z.Bytes{Value: res}, nil
 	}
 }
 
 // FuncAIRSsE transform a function of 'func(int) ([]string, error)' signature
 // into CallableFunc type.
-func FuncAIRSsE(fn func(int) ([]string, error)) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAIRSsE(fn func(int) ([]string, error)) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		i1, ok := tengo.ToInt(args[0])
+		i1, ok := z.ToInt(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "int(compatible)",
 				Found:    args[0].TypeName(),
@@ -1014,12 +1014,12 @@ func FuncAIRSsE(fn func(int) ([]string, error)) tengo.CallableFunc {
 		if err != nil {
 			return wrapError(err), nil
 		}
-		arr := &tengo.Array{}
+		arr := &z.Array{}
 		for _, r := range res {
-			if len(r) > tengo.MaxStringLen {
-				return nil, tengo.ErrStringLimit
+			if len(r) > z.MaxStringLen {
+				return nil, z.ErrStringLimit
 			}
-			arr.Value = append(arr.Value, &tengo.String{Value: r})
+			arr.Value = append(arr.Value, &z.String{Value: r})
 		}
 		return arr, nil
 	}
@@ -1027,23 +1027,23 @@ func FuncAIRSsE(fn func(int) ([]string, error)) tengo.CallableFunc {
 
 // FuncAIRS transform a function of 'func(int) string' signature into
 // CallableFunc type.
-func FuncAIRS(fn func(int) string) tengo.CallableFunc {
-	return func(args ...tengo.Object) (ret tengo.Object, err error) {
+func FuncAIRS(fn func(int) string) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
 		if len(args) != 1 {
-			return nil, tengo.ErrWrongNumArguments
+			return nil, z.ErrWrongNumArguments
 		}
-		i1, ok := tengo.ToInt(args[0])
+		i1, ok := z.ToInt(args[0])
 		if !ok {
-			return nil, tengo.ErrInvalidArgumentType{
+			return nil, z.ErrInvalidArgumentType{
 				Name:     "first",
 				Expected: "int(compatible)",
 				Found:    args[0].TypeName(),
 			}
 		}
 		s := fn(i1)
-		if len(s) > tengo.MaxStringLen {
-			return nil, tengo.ErrStringLimit
+		if len(s) > z.MaxStringLen {
+			return nil, z.ErrStringLimit
 		}
-		return &tengo.String{Value: s}, nil
+		return &z.String{Value: s}, nil
 	}
 }
