@@ -2,7 +2,7 @@ package z_test
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -1009,7 +1009,7 @@ r["x"] = {
 
 	expectCompileError(t, `import("")`, "empty module name")
 
-	// https://github.com/d5/z/issues/314
+	// https://github.com/diiyw/z/issues/314
 	expectCompileError(t, `
 (func() {
 	fn := fn()
@@ -1256,7 +1256,7 @@ func TestCompiler_custom_extension(t *testing.T) {
 
 	modules := stdlib.GetModuleMap(stdlib.AllModuleNames()...)
 
-	src, err := ioutil.ReadFile(pathFileSource)
+	src, err := os.ReadFile(pathFileSource)
 	require.NoError(t, err)
 
 	// Escape shegang

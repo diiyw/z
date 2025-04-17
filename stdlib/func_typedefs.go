@@ -28,6 +28,26 @@ func FuncARI(fn func() int) z.CallableFunc {
 	}
 }
 
+// FuncAIRI transform a function of 'func(int) int' signature into CallableFunc
+// type.
+func FuncAIRI(fn func(int) int) z.CallableFunc {
+	return func(args ...z.Object) (ret z.Object, err error) {
+		if len(args) != 1 {
+			return nil, z.ErrWrongNumArguments
+		}
+
+		i1, ok := z.ToInt(args[0])
+		if !ok {
+			return nil, z.ErrInvalidArgumentType{
+				Name:     "first",
+				Expected: "int(compatible)",
+				Found:    args[0].TypeName(),
+			}
+		}
+		return &z.Int{Value: int64(fn(i1))}, nil
+	}
+}
+
 // FuncARI64 transform a function of 'func() int64' signature into CallableFunc
 // type.
 func FuncARI64(fn func() int64) z.CallableFunc {

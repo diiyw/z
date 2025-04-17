@@ -10,7 +10,7 @@
 
 In Z, all object types _(both [runtime types](#runtime-object-types) and
 [user types](#user-object-types))_ must implement
-[Object](https://godoc.org/github.com/d5/z#Object) interface.
+[Object](https://godoc.org/github.com/diiyw/z#Object) interface.
 
 ### Object Interface
 
@@ -60,7 +60,7 @@ IsFalsy() bool
 ```
 
 IsFalsy method should return true if the underlying value is considered to be
-[falsy](https://github.com/d5/z/blob/master/docs/runtime-types.md#objectisfalsy).
+[falsy](https://github.com/diiyw/z/blob/master/docs/runtime-types.md#objectisfalsy).
 
 ```golang
 Equals(o Object) bool
@@ -157,7 +157,7 @@ Iterate() Iterator
 ```
 
 The Iterate method should return another object that implements
-[Iterator](https://godoc.org/github.com/d5/z#Iterator) interface.
+[Iterator](https://godoc.org/github.com/diiyw/z#Iterator) interface.
 
 ### Iterator Interface
 
@@ -193,40 +193,40 @@ again.
 
 These are the basic types Z runtime supports out of the box:
 
-- Primitive value types: [Int](https://godoc.org/github.com/d5/z#Int),
-  [String](https://godoc.org/github.com/d5/z#String),
-  [Float](https://godoc.org/github.com/d5/z#Float),
-  [Bool](https://godoc.org/github.com/d5/z#ArrayIterator),
-  [Char](https://godoc.org/github.com/d5/z#Char),
-  [Bytes](https://godoc.org/github.com/d5/z#Bytes),
-  [Time](https://godoc.org/github.com/d5/z#Time)
-- Composite value types: [Array](https://godoc.org/github.com/d5/z#Array),
-  [ImmutableArray](https://godoc.org/github.com/d5/z#ImmutableArray),
-  [Map](https://godoc.org/github.com/d5/z#Map),
-  [ImmutableMap](https://godoc.org/github.com/d5/z#ImmutableMap)
+- Primitive value types: [Int](https://godoc.org/github.com/diiyw/z#Int),
+  [String](https://godoc.org/github.com/diiyw/z#String),
+  [Float](https://godoc.org/github.com/diiyw/z#Float),
+  [Bool](https://godoc.org/github.com/diiyw/z#ArrayIterator),
+  [Char](https://godoc.org/github.com/diiyw/z#Char),
+  [Bytes](https://godoc.org/github.com/diiyw/z#Bytes),
+  [Time](https://godoc.org/github.com/diiyw/z#Time)
+- Composite value types: [Array](https://godoc.org/github.com/diiyw/z#Array),
+  [ImmutableArray](https://godoc.org/github.com/diiyw/z#ImmutableArray),
+  [Map](https://godoc.org/github.com/diiyw/z#Map),
+  [ImmutableMap](https://godoc.org/github.com/diiyw/z#ImmutableMap)
 - Functions:
-  [CompiledFunction](https://godoc.org/github.com/d5/z#CompiledFunction),
-  [BuiltinFunction](https://godoc.org/github.com/d5/z#BuiltinFunction),
-  [UserFunction](https://godoc.org/github.com/d5/z#UserFunction)
-- [Iterators](https://godoc.org/github.com/d5/z#Iterator):
-  [StringIterator](https://godoc.org/github.com/d5/z#StringIterator),
-  [ArrayIterator](https://godoc.org/github.com/d5/z#ArrayIterator),
-  [MapIterator](https://godoc.org/github.com/d5/z#MapIterator),
-  [ImmutableMapIterator](https://godoc.org/github.com/d5/z#ImmutableMapIterator)
-- [Error](https://godoc.org/github.com/d5/z#Error)
-- [Undefined](https://godoc.org/github.com/d5/z#Undefined)
-- Other internal objects: [Break](https://godoc.org/github.com/d5/z#Break),
-  [Continue](https://godoc.org/github.com/d5/z#Continue),
-  [ReturnValue](https://godoc.org/github.com/d5/z#ReturnValue)
+  [CompiledFunction](https://godoc.org/github.com/diiyw/z#CompiledFunction),
+  [BuiltinFunction](https://godoc.org/github.com/diiyw/z#BuiltinFunction),
+  [UserFunction](https://godoc.org/github.com/diiyw/z#UserFunction)
+- [Iterators](https://godoc.org/github.com/diiyw/z#Iterator):
+  [StringIterator](https://godoc.org/github.com/diiyw/z#StringIterator),
+  [ArrayIterator](https://godoc.org/github.com/diiyw/z#ArrayIterator),
+  [MapIterator](https://godoc.org/github.com/diiyw/z#MapIterator),
+  [ImmutableMapIterator](https://godoc.org/github.com/diiyw/z#ImmutableMapIterator)
+- [Error](https://godoc.org/github.com/diiyw/z#Error)
+- [Undefined](https://godoc.org/github.com/diiyw/z#Undefined)
+- Other internal objects: [Break](https://godoc.org/github.com/diiyw/z#Break),
+  [Continue](https://godoc.org/github.com/diiyw/z#Continue),
+  [ReturnValue](https://godoc.org/github.com/diiyw/z#ReturnValue)
 
 See
-[Runtime Types](https://github.com/d5/z/blob/master/docs/runtime-types.md)
+[Runtime Types](https://github.com/diiyw/z/blob/master/docs/runtime-types.md)
 for more details on these runtime types.
 
 ## User Object Types
 
 Users can easily extend and add their own types by implementing the same
-[Object](https://godoc.org/github.com/d5/z#Object) interface and the
+[Object](https://godoc.org/github.com/diiyw/z#Object) interface and the
 default `ObjectImpl` implementation. Z runtime will treat them in the
 same way as its runtime types with no performance overhead.
 
@@ -290,7 +290,7 @@ func (o *StringArray) TypeName() string {
 ```
 
 You can use a user type via either
-[Script.Add](https://godoc.org/github.com/d5/z#Script.Add) or by directly
+[Script.Add](https://godoc.org/github.com/diiyw/z#Script.Add) or by directly
 manipulating the symbol table and the global variables. Here's an example code
 to add `StringArray` to the script:
 

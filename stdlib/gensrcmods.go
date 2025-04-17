@@ -5,8 +5,8 @@ package main
 
 import (
 	"bytes"
-	"io/ioutil"
 	"log"
+	"os"
 	"regexp"
 	"strconv"
 )
@@ -17,7 +17,7 @@ func main() {
 	modules := make(map[string]string)
 
 	// enumerate all Z module files
-	files, err := ioutil.ReadDir(".")
+	files, err := os.ReadDir(".")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -26,7 +26,7 @@ func main() {
 		if m != nil {
 			modName := m[1]
 
-			src, err := ioutil.ReadFile(file.Name())
+			src, err := os.ReadFile(file.Name())
 			if err != nil {
 				log.Fatalf("file '%s' read error: %s",
 					file.Name(), err.Error())
@@ -50,7 +50,7 @@ var SourceModules = map[string]string{` + "\n")
 	out.WriteString("}\n")
 
 	const target = "source_modules.go"
-	if err := ioutil.WriteFile(target, out.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(target, out.Bytes(), 0644); err != nil {
 		log.Fatal(err)
 	}
 }

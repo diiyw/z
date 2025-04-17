@@ -8,11 +8,11 @@ compiled and executed as native binary using `z` CLI tool.
 To install `z` tool, run:
 
 ```bash
-go get github.com/d5/z/cmd/z
+go get github.com/diiyw/z/cmd/z
 ```
 
 Or, you can download the precompiled binaries from
-[here](https://github.com/d5/z/releases/latest).
+[here](https://github.com/diiyw/z/releases/latest).
 
 ## Compiling and Executing Z Code
 

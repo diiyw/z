@@ -111,10 +111,6 @@ var textModule = map[string]z.Object{
 		Name:  "split_n",
 		Value: FuncASSIRSs(strings.SplitN),
 	}, // split_n(s, sep, n) => [string]
-	"title": &z.UserFunction{
-		Name:  "title",
-		Value: FuncASRS(strings.Title),
-	}, // title(s) => string
 	"to_lower": &z.UserFunction{
 		Name:  "to_lower",
 		Value: FuncASRS(strings.ToLower),

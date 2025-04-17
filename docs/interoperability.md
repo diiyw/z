@@ -14,13 +14,13 @@
 Embedding and executing the Z code in Go is very easy. At a high level,
 this process is like:
 
-- create a [Script](https://godoc.org/github.com/d5/z#Script) instance with
+- create a [Script](https://godoc.org/github.com/diiyw/z#Script) instance with
 your code,
 - _optionally_ add some
-[Script Variables](https://godoc.org/github.com/d5/z#Variable) to Script,
+[Script Variables](https://godoc.org/github.com/diiyw/z#Variable) to Script,
 - compile or directly run the script,
 - retrieve _output_ values from the
-[Compiled](https://godoc.org/github.com/d5/z#Compiled) instance.
+[Compiled](https://godoc.org/github.com/diiyw/z#Compiled) instance.
 
 The following is an example where a Z script is compiled and run with no
 input/output variables.
@@ -48,7 +48,7 @@ func main() {
 
 Here's another example where an input variable is added to the script, and, an
 output variable is accessed through
-[Variable.Int](https://godoc.org/github.com/d5/z#Variable.Int) function:
+[Variable.Int](https://godoc.org/github.com/diiyw/z#Variable.Int) function:
 
 ```golang
 import (
@@ -91,23 +91,23 @@ func main() {
 ```
 
 A variable `b` is defined by the user before compilation using
-[Script.Add](https://godoc.org/github.com/d5/z#Script.Add) function. Then a
+[Script.Add](https://godoc.org/github.com/diiyw/z#Script.Add) function. Then a
 compiled bytecode `c` is used to execute the bytecode and get the value of
 global variables. In this example, the value of global variable `a` is read
-using [Compiled.Get](https://godoc.org/github.com/d5/z#Compiled.Get)
+using [Compiled.Get](https://godoc.org/github.com/diiyw/z#Compiled.Get)
 function. See
-[documentation](https://godoc.org/github.com/d5/z#Variable) for the
+[documentation](https://godoc.org/github.com/diiyw/z#Variable) for the
 full list of variable value functions.
 
 Value of the global variables can be replaced using
-[Compiled.Set](https://godoc.org/github.com/d5/z#Compiled.Set) function.
+[Compiled.Set](https://godoc.org/github.com/diiyw/z#Compiled.Set) function.
 But it will return an error if you try to set the value of un-defined global
 variables _(e.g. trying to set the value of `x` in the example)_.  
 
 ### Type Conversion Table
 
 When adding a Variable
-_([Script.Add](https://godoc.org/github.com/d5/z#Script.Add))_, Script
+_([Script.Add](https://godoc.org/github.com/diiyw/z#Script.Add))_, Script
 converts Go values into Z values based on the following conversion table.
 
 | Go Type | Z Type | Note |
@@ -132,10 +132,10 @@ converts Go values into Z values based on the following conversion table.
 ### User Types
 
 Users can add and use a custom user type in Z code by implementing
-[Object](https://godoc.org/github.com/d5/z#Object) interface. Z runtime
+[Object](https://godoc.org/github.com/diiyw/z#Object) interface. Z runtime
 will treat the user types in the same way it does to the runtime types with no
 performance overhead. See
-[Object Types](https://github.com/d5/z/blob/master/docs/objects.md) for
+[Object Types](https://github.com/diiyw/z/blob/master/docs/objects.md) for
 more details.
 
 ## Sandbox Environments
@@ -147,7 +147,7 @@ the following Script functions.
 
 SetImports sets the import modules with corresponding names. Script **does not**
 include any modules by default. You can use this function to include the
-[Standard Library](https://github.com/d5/z/blob/master/docs/stdlib.md).
+[Standard Library](https://github.com/diiyw/z/blob/master/docs/stdlib.md).
 
 ```golang
 s := z.NewScript([]byte(`math := import("math"); a := math.abs(-19.84)`))
@@ -251,8 +251,8 @@ for i := 0; i < concurrency; i++ {
 ## Compiler and VM
 
 Although it's not recommended, you can directly create and run the Z
-[Compiler](https://godoc.org/github.com/d5/z#Compiler), and
-[VM](https://godoc.org/github.com/d5/z#VM) for yourself instead of using
+[Compiler](https://godoc.org/github.com/diiyw/z#Compiler), and
+[VM](https://godoc.org/github.com/diiyw/z#VM) for yourself instead of using
 Scripts and Script Variables. It's a bit more involved as you have to manage
 the symbol tables and global variables between them, but, basically that's what
 Script and Script Variable is doing internally.

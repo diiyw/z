@@ -1803,7 +1803,7 @@ func() {
 		nil, z.UndefinedValue)
 
 	// 'f' in RHS at line 4 must reference global variable 'f'
-	// See https://github.com/d5/z/issues/314
+	// See https://github.com/diiyw/z/issues/314
 	expectRun(t, `
 f := func() { return 2 }
 out = (func() {

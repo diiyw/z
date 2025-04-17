@@ -240,7 +240,7 @@ func Encode(o z.Object) ([]byte, error) {
 		b = strconv.AppendInt(b, o.Value, 10)
 	case *z.String:
 		// string encoding bug is fixed with newly introduced function
-		// encodeString(). See: https://github.com/d5/z/issues/268
+		// encodeString(). See: https://github.com/diiyw/z/issues/268
 		b = encodeString(b, o.Value)
 	case *z.Time:
 		y, err := o.Value.MarshalJSON()
