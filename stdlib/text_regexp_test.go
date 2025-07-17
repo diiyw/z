@@ -3,7 +3,7 @@ package stdlib_test
 import (
 	"testing"
 
-	"github.com/d5/tengo/v2"
+	"github.com/diiyw/z"
 )
 
 func TestTextREAlternation(t *testing.T) {
@@ -21,9 +21,9 @@ func TestTextREAlternation(t *testing.T) {
 		},
 	}, "alternation with number")
 
-	module(t, "text").call("re_find", "([a-zA-Z])|([0-9])", "").expect(tengo.UndefinedValue, "empty input")
+	module(t, "text").call("re_find", "([a-zA-Z])|([0-9])", "").expect(z.UndefinedValue, "empty input")
 
-	module(t, "text").call("re_find", "([a-zA-Z])|([0-9])", "!").expect(tengo.UndefinedValue, "non-matching input")
+	module(t, "text").call("re_find", "([a-zA-Z])|([0-9])", "!").expect(z.UndefinedValue, "non-matching input")
 
 	module(t, "text").call("re_find", "(?:([a-zA-Z])|([0-9]))+", "a5b").expect(ARR{
 		ARR{
