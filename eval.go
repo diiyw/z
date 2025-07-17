@@ -13,8 +13,8 @@ import (
 func Eval(
 	ctx context.Context,
 	expr string,
-	params map[string]interface{},
-) (interface{}, error) {
+	params map[string]any,
+) (any, error) {
 	expr = strings.TrimSpace(expr)
 	if expr == "" {
 		return nil, fmt.Errorf("empty expression")

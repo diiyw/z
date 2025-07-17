@@ -122,7 +122,7 @@ Or, if you need to evaluate a simple expression, you can use [Eval](https://pkg.
 ```golang
 res, err := z.Eval(ctx,
 	`input ? "success" : "fail"`,
-	map[string]interface{}{"input": 1})
+	map[string]any{"input": 1})
 if err != nil {
 	panic(err)
 }

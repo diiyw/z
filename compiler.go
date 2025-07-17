@@ -1141,7 +1141,7 @@ func (c *Compiler) error(node parser.Node, err error) error {
 func (c *Compiler) errorf(
 	node parser.Node,
 	format string,
-	args ...interface{},
+	args ...any,
 ) error {
 	return &CompilerError{
 		FileSet: c.file.Set(),
@@ -1299,7 +1299,7 @@ func (c *Compiler) emit(
 	return pos
 }
 
-func (c *Compiler) printTrace(a ...interface{}) {
+func (c *Compiler) printTrace(a ...any) {
 	const (
 		dots = ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . "
 		n    = len(dots)

@@ -19,10 +19,10 @@ import (
 
 const testOut = "out"
 
-type IARR []interface{}
-type IMAP map[string]interface{}
-type MAP = map[string]interface{}
-type ARR = []interface{}
+type IARR []any
+type IMAP map[string]any
+type MAP = map[string]any
+type ARR = []any
 
 type testopts struct {
 	modules     *z.ModuleMap
@@ -58,7 +58,7 @@ func (o *testopts) Stdlib() *testopts {
 	return o
 }
 
-func (o *testopts) Module(name string, mod interface{}) *testopts {
+func (o *testopts) Module(name string, mod any) *testopts {
 	c := o.copy()
 	switch mod := mod.(type) {
 	case z.Importable:
@@ -3312,7 +3312,7 @@ func TestSourceModules(t *testing.T) {
 		z.UndefinedValue) // non-enumerable: undefined
 }
 
-func testEnumModule(t *testing.T, input string, expected interface{}) {
+func testEnumModule(t *testing.T, input string, expected any) {
 	expectRun(t, `enum := import("enum"); `+input,
 		Opts().Module("enum", stdlib.SourceModules["enum"]),
 		expected)
@@ -3645,7 +3645,7 @@ func expectRun(
 	t *testing.T,
 	input string,
 	opts *testopts,
-	expected interface{},
+	expected any,
 ) {
 	if opts == nil {
 		opts = Opts()
@@ -3766,7 +3766,7 @@ func expectErrorAs(
 	t *testing.T,
 	input string,
 	opts *testopts,
-	expected interface{},
+	expected any,
 ) {
 	if opts == nil {
 		opts = Opts()
@@ -3904,11 +3904,11 @@ func parse(t *testing.T, input string) *parser.File {
 	return file
 }
 
-func errorObject(v interface{}) *z.Error {
+func errorObject(v any) *z.Error {
 	return &z.Error{Value: toObject(v)}
 }
 
-func toObject(v interface{}) z.Object {
+func toObject(v any) z.Object {
 	switch v := v.(type) {
 	case z.Object:
 		return v

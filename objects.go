@@ -360,7 +360,7 @@ type BuiltinModule struct {
 }
 
 // Import returns an immutable map for the module.
-func (m *BuiltinModule) Import(moduleName string) (interface{}, error) {
+func (m *BuiltinModule) Import(moduleName string) (any, error) {
 	return m.AsImmutableMap(moduleName), nil
 }
 

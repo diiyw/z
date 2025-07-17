@@ -10,10 +10,10 @@ import (
 	"github.com/diiyw/z/stdlib"
 )
 
-type ARR = []interface{}
-type MAP = map[string]interface{}
-type IARR []interface{}
-type IMAP map[string]interface{}
+type ARR = []any
+type MAP = map[string]any
+type IARR []any
+type IMAP map[string]any
 
 func TestAllModuleNames(t *testing.T) {
 	names := stdlib.AllModuleNames()
@@ -96,11 +96,11 @@ func TestGetModules(t *testing.T) {
 
 type callres struct {
 	t *testing.T
-	o interface{}
+	o any
 	e error
 }
 
-func (c callres) call(funcName string, args ...interface{}) callres {
+func (c callres) call(funcName string, args ...any) callres {
 	if c.e != nil {
 		return c
 	}
@@ -147,7 +147,7 @@ func (c callres) call(funcName string, args ...interface{}) callres {
 	}
 }
 
-func (c callres) expect(expected interface{}, msgAndArgs ...interface{}) {
+func (c callres) expect(expected any, msgAndArgs ...any) {
 	require.NoError(c.t, c.e, msgAndArgs...)
 	require.Equal(c.t, object(expected), c.o, msgAndArgs...)
 }
@@ -165,7 +165,7 @@ func module(t *testing.T, moduleName string) callres {
 	return callres{t: t, o: mod}
 }
 
-func object(v interface{}) z.Object {
+func object(v any) z.Object {
 	switch v := v.(type) {
 	case z.Object:
 		return v
@@ -230,7 +230,7 @@ func object(v interface{}) z.Object {
 	panic(fmt.Errorf("unknown type: %T", v))
 }
 
-func expect(t *testing.T, input string, expected interface{}) {
+func expect(t *testing.T, input string, expected any) {
 	s := z.NewScript([]byte(input))
 	s.SetImports(stdlib.GetModuleMap(stdlib.AllModuleNames()...))
 	c, err := s.Run()

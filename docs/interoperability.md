@@ -124,9 +124,9 @@ converts Go values into Z values based on the following conversion table.
 |`time.Time`|`Time`||
 |`error`|`Error{String}`|use `error.Error()` as String value|
 |`map[string]Object`|`Map`||
-|`map[string]interface{}`|`Map`|individual elements converted to Z objects|
+|`map[string]any`|`Map`|individual elements converted to Z objects|
 |`[]Object`|`Array`||
-|`[]interface{}`|`Array`|individual elements converted to Z objects|
+|`[]any`|`Array`|individual elements converted to Z objects|
 |`Object`|`Object`|_(no type conversion performed)_|
 
 ### User Types

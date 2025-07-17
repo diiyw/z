@@ -28,7 +28,7 @@ func Test_builtinDelete(t *testing.T) {
 		want      z.Object
 		wantErr   bool
 		wantedErr error
-		target    interface{}
+		target    any
 	}{
 		{name: "invalid-arg", args: args{[]z.Object{&z.String{},
 			&z.String{}}}, wantErr: true,

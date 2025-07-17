@@ -84,8 +84,8 @@ func fmtSprintf(args ...z.Object) (ret z.Object, err error) {
 	return &z.String{Value: s}, nil
 }
 
-func getPrintArgs(args ...z.Object) ([]interface{}, error) {
-	var printArgs []interface{}
+func getPrintArgs(args ...z.Object) ([]any, error) {
+	var printArgs []any
 	l := 0
 	for _, arg := range args {
 		s, _ := z.ToString(arg)
