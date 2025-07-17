@@ -280,12 +280,14 @@ func textREFind(args ...z.Object) (ret z.Object, err error) {
 
 		arr := &z.Array{}
 		for i := 0; i < len(m); i += 2 {
-			arr.Value = append(arr.Value,
-				&z.ImmutableMap{Value: map[string]z.Object{
-					"text":  &z.String{Value: s2[m[i]:m[i+1]]},
-					"begin": &z.Int{Value: int64(m[i])},
-					"end":   &z.Int{Value: int64(m[i+1])},
-				}})
+			if m[i] >= 0 && m[i+1] >= 0 {
+				arr.Value = append(arr.Value,
+					&z.ImmutableMap{Value: map[string]z.Object{
+						"text":  &z.String{Value: s2[m[i]:m[i+1]]},
+						"begin": &z.Int{Value: int64(m[i])},
+						"end":   &z.Int{Value: int64(m[i+1])},
+					}})
+			}
 		}
 
 		ret = &z.Array{Value: []z.Object{arr}}
@@ -312,12 +314,14 @@ func textREFind(args ...z.Object) (ret z.Object, err error) {
 	for _, m := range m {
 		subMatch := &z.Array{}
 		for i := 0; i < len(m); i += 2 {
-			subMatch.Value = append(subMatch.Value,
-				&z.ImmutableMap{Value: map[string]z.Object{
-					"text":  &z.String{Value: s2[m[i]:m[i+1]]},
-					"begin": &z.Int{Value: int64(m[i])},
-					"end":   &z.Int{Value: int64(m[i+1])},
-				}})
+			if m[i] >= 0 && m[i+1] >= 0 {
+				subMatch.Value = append(subMatch.Value,
+					&z.ImmutableMap{Value: map[string]z.Object{
+						"text":  &z.String{Value: s2[m[i]:m[i+1]]},
+						"begin": &z.Int{Value: int64(m[i])},
+						"end":   &z.Int{Value: int64(m[i+1])},
+					}})
+			}
 		}
 
 		arr.Value = append(arr.Value, subMatch)
