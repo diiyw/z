@@ -1,8 +1,6 @@
 # The Z Language
 
 [![GoDoc](https://godoc.org/github.com/diiyw/z?status.svg)](https://godoc.org/github.com/diiyw/z)
-![test](https://github.com/diiyw/z/workflows/test/badge.svg)
-[![Go Report Card](https://goreportcard.com/badge/github.com/diiyw/z)](https://goreportcard.com/report/github.com/diiyw/z)
 
 **Z is a small, dynamic, fast, secure script language for Go.** 
 
@@ -25,9 +23,6 @@ sum := func(init, seq) {
 fmt.println(sum(0, [1, 2, 3]))   // "6"
 fmt.println(sum("", [1, 2, 3]))  // "123"
 ```
-
-> Test this Z code in the
-> [Z Playground](https://zlang.com/?s=0c8d5d0d88f2795a7093d7f35ae12c3afa17bea3)
 
 ## Features
 
@@ -144,7 +139,6 @@ fmt.Println(res) // "success"
 - [Interoperability](https://github.com/diiyw/z/blob/master/docs/interoperability.md)
 - [Z CLI](https://github.com/diiyw/z/blob/master/docs/z-cli.md)
 - [Standard Library](https://github.com/diiyw/z/blob/master/docs/stdlib.md)
-- Syntax Highlighters: [VSCode](https://github.com/lissein/vscode-z), [Atom](https://github.com/diiyw/z-atom), [Vim](https://github.com/geseq/z-vim)
-- **Why the name Z?** It's from [1Q84](https://en.wikipedia.org/wiki/1Q84).
+- Syntax Highlighters: [VSCode](https://github.com/lissein/vscode-z)
 
 
