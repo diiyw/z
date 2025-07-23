@@ -88,9 +88,9 @@ func (s *BlockStmt) End() Pos {
 func (s *BlockStmt) String() string {
 	var list []string
 	for _, e := range s.Stmts {
-		list = append(list, e.String())
+		list = append(list, "  "+e.String())
 	}
-	return "{" + strings.Join(list, "; ") + "}"
+	return "{\n" + strings.Join(list, "\n") + "\n}"
 }
 
 // BranchStmt represents a branch statement.

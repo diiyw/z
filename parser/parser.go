@@ -867,14 +867,15 @@ func (p *Parser) parseIfHeader() (init Stmt, cond Expr) {
 	init = p.parseSimpleStmt(false)
 
 	var condStmt Stmt
-	if p.token == token.LBrace {
+	switch p.token {
+	case token.LBrace:
 		condStmt = init
 		init = nil
-	} else if p.token == token.Semicolon {
+	case token.Semicolon:
 		p.next()
 
 		condStmt = p.parseSimpleStmt(false)
-	} else {
+	default:
 		p.error(p.pos, "missing condition in if statement")
 	}
 
@@ -1041,12 +1042,13 @@ func (p *Parser) parseMapElementLit() *MapElementLit {
 
 	pos := p.pos
 	name := "_"
-	if p.token == token.Ident {
+	switch p.token {
+	case token.Ident:
 		name = p.tokenLit
-	} else if p.token == token.String {
+	case token.String:
 		v, _ := strconv.Unquote(p.tokenLit)
 		name = v
-	} else {
+	default:
 		p.errorExpected(pos, "map key")
 	}
 	p.next()

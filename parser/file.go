@@ -25,5 +25,5 @@ func (n *File) String() string {
 	for _, e := range n.Stmts {
 		stmts = append(stmts, e.String())
 	}
-	return strings.Join(stmts, "; ")
+	return strings.Join(stmts, "\n")
 }
