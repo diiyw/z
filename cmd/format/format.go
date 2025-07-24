@@ -48,34 +48,39 @@ func (p *printer) printAssignStmt(s *parser.AssignStmt) {
 	for _, e := range s.RHS {
 		rhs = append(rhs, p.printExpr(e))
 	}
-	p.print(strings.Join(lhs, ", ") + " " + s.Token.String() +
-		" " + strings.Join(rhs, ", "))
+	p.print(strings.Join(lhs, ", ")+" "+s.Token.String()+
+		" "+strings.Join(rhs, ", "), true)
 }
 
 func (p *printer) printExportStmt(s *parser.ExportStmt) {
-	p.print("export " + p.printExpr(s.Result))
+	p.level++
+	result := p.printExpr(s.Result)
+	p.level--
+	p.print("export "+result, true)
 }
 
 func (p *printer) printBlockStmt(s *parser.BlockStmt) {
-	p.print("{")
-	p.level++
-	p.printStmts(s.Stmts)
-	p.level--
-	p.print("}")
+	p.print("{", false)
+	if len(s.Stmts) > 0 {
+		p.level++
+		p.printStmts(s.Stmts)
+		p.level--
+	}
+	p.print("}", true)
 }
 
 func (p *printer) printExprStmt(s *parser.ExprStmt) {
-	p.print(p.printExpr(s.Expr))
+	p.print(p.printExpr(s.Expr), true)
 }
 
 func (p *printer) printForInStmt(s *parser.ForInStmt) {
 	if s.Value != nil {
-		p.print("for " + p.printExpr(s.Key) + ", " + p.printExpr(s.Value) +
-			" in " + p.printExpr(s.Iterable) + " ")
+		p.print("for "+p.printExpr(s.Key)+", "+p.printExpr(s.Value)+
+			" in "+p.printExpr(s.Iterable)+" ", true)
 		p.printStmt(s.Body)
 		return
 	}
-	p.print("for " + p.printExpr(s.Key) + " in " + p.printExpr(s.Iterable) + " ")
+	p.print("for "+p.printExpr(s.Key)+" in "+p.printExpr(s.Iterable)+" ", true)
 	p.printStmt(s.Body)
 	return
 }
@@ -85,41 +90,41 @@ func (p *printer) printForStmt(s *parser.ForStmt) {
 	if s.Cond != nil {
 		cond = p.printExpr(s.Cond) + " "
 	}
-	p.print("for ")
+	p.print("for ", true)
 	if s.Init != nil && s.Post != nil {
 		p.printStmt(s.Init)
-		p.print(" ; " + cond + " ; ")
+		p.print(" ; "+cond+" ; ", true)
 		p.printStmt(s.Post)
 	} else {
-		p.print("for " + cond)
+		p.print("for "+cond, true)
 	}
 	p.printStmt(s.Body)
 }
 
 func (p *printer) printIfStmt(s *parser.IfStmt) {
-	p.print("if ")
+	p.print("if ", true)
 	if s.Init != nil {
 		p.printStmt(s.Init)
 	}
-	p.print(p.printExpr(s.Cond))
+	p.print(p.printExpr(s.Cond), true)
 	p.printStmt(s.Body)
 	if s.Else != nil {
-		p.print(" else ")
+		p.print(" else ", true)
 		p.printStmt(s.Else)
 	}
 }
 
 func (p *printer) printIncDecStmt(s *parser.IncDecStmt) {
-	p.print(p.printExpr(s.Expr))
-	p.print(s.Token.String())
+	p.print(p.printExpr(s.Expr), true)
+	p.print(s.Token.String(), true)
 }
 
 func (p *printer) printReturnStmt(s *parser.ReturnStmt) {
 	if s.Result != nil {
-		p.print("return " + p.printExpr(s.Result))
+		p.print("return "+p.printExpr(s.Result), true)
 		return
 	}
-	p.print("return")
+	p.print("return", true)
 	return
 }
 
@@ -190,9 +195,8 @@ func (p *printer) printBadExpr(e *parser.BadExpr) string {
 }
 
 func (p *printer) printBinaryExpr(e *parser.BinaryExpr) string {
-	// TODO 优先级的处理
-	return "(" + p.printExpr(e.LHS) + " " + e.Token.String() +
-		" " + p.printExpr(e.RHS) + ")"
+	return p.printExpr(e.LHS) + " " + e.Token.String() +
+		" " + p.printExpr(e.RHS)
 }
 
 func (p *printer) printBoolLit(e *parser.BoolLit) string {
@@ -228,8 +232,8 @@ func (p *printer) printFloatLit(e *parser.FloatLit) string {
 }
 
 func (p *printer) printFuncLit(e *parser.FuncLit) string {
-	var np = &printer{}
-	np.printStmt(e.Body)
+	var np = &printer{level: p.level}
+	np.printBlockStmt(e.Body)
 	return "func" + e.Type.Params.String() + " " + np.result
 }
 
@@ -270,7 +274,11 @@ func (p *printer) printMapLit(e *parser.MapLit) string {
 	for _, m := range e.Elements {
 		elements = append(elements, p.printExpr(m))
 	}
-	return "{" + strings.Join(elements, ", ") + "}"
+	if len(elements) == 0 {
+		return "{\n}"
+	}
+	spaces := strings.Repeat("\t", p.level)
+	return "{\n\t" + strings.Join(elements, ",\n"+spaces) + "}"
 }
 
 func (p *printer) printParenExpr(e *parser.ParenExpr) string {
@@ -304,8 +312,10 @@ func (p *printer) printUndefinedLit(e *parser.UndefinedLit) string {
 	return e.String()
 }
 
-func (p *printer) print(v string) {
-	p.result += strings.Repeat(" ", p.level)
+func (p *printer) print(v string, prefix bool) {
+	if prefix {
+		p.result += strings.Repeat("\t", p.level)
+	}
 	p.result += v + "\n"
 }
 
@@ -317,7 +327,8 @@ func Format(src []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var printer = &printer{}
-	printer.printStmts(parsedFile.Stmts)
-	return printer.result, nil
+	var pt = &printer{}
+	pt.printStmts(parsedFile.Stmts)
+	pt.result = strings.TrimSuffix(pt.result, "\n")
+	return pt.result, nil
 }

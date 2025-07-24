@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/diiyw/z"
+	"github.com/diiyw/z/cmd/format"
 	"github.com/diiyw/z/parser"
 	"github.com/diiyw/z/stdlib"
 )
@@ -43,6 +44,27 @@ func main() {
 		os.Exit(2)
 	} else if showVersion {
 		fmt.Println(version)
+		return
+	}
+
+	// 新增 fmt 命令支持
+	if flag.NArg() > 0 && flag.Arg(0) == "fmt" {
+		if flag.NArg() < 2 {
+			fmt.Fprintln(os.Stderr, "Usage: z fmt <file>")
+			os.Exit(1)
+		}
+		file := flag.Arg(1)
+		data, err := os.ReadFile(file)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error reading file: %s\n", err)
+			os.Exit(1)
+		}
+		result, err := format.Format(data)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Format error: %s\n", err)
+			os.Exit(1)
+		}
+		fmt.Print(result)
 		return
 	}
 
