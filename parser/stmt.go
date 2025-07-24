@@ -90,7 +90,7 @@ func (s *BlockStmt) String() string {
 	for _, e := range s.Stmts {
 		list = append(list, "  "+e.String())
 	}
-	return "{\n" + strings.Join(list, "\n") + "\n}"
+	return "{" + strings.Join(list, "\n") + "}"
 }
 
 // BranchStmt represents a branch statement.
