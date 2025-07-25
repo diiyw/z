@@ -154,6 +154,15 @@ export {
 	c: 3
 }`,
 		},
+		{
+			name:  "map 2",
+			input: `{"()":1,b:2,c:3}`,
+			expected: `{
+	"()": 1,
+	b: 2,
+	c: 3
+}`,
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

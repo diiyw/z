@@ -273,21 +273,22 @@ func (c *Compiler) Compile(node parser.Node) error {
 	case *parser.ForInStmt:
 		return c.compileForInStmt(node)
 	case *parser.BranchStmt:
-		if node.Token == token.Break {
+		switch node.Token {
+		case token.Break:
 			curLoop := c.currentLoop()
 			if curLoop == nil {
 				return c.errorf(node, "break not allowed outside loop")
 			}
 			pos := c.emit(node, parser.OpJump, 0)
 			curLoop.Breaks = append(curLoop.Breaks, pos)
-		} else if node.Token == token.Continue {
+		case token.Continue:
 			curLoop := c.currentLoop()
 			if curLoop == nil {
 				return c.errorf(node, "continue not allowed outside loop")
 			}
 			pos := c.emit(node, parser.OpJump, 0)
 			curLoop.Continues = append(curLoop.Continues, pos)
-		} else {
+		default:
 			panic(fmt.Errorf("invalid branch statement: %s",
 				node.Token.String()))
 		}
@@ -337,11 +338,18 @@ func (c *Compiler) Compile(node parser.Node) error {
 	case *parser.MapLit:
 		for _, elt := range node.Elements {
 			// key
-			if len(elt.Key) > MaxStringLen {
+			key := "_"
+			switch v := elt.Key.(type) {
+			case *parser.Ident:
+				key = v.Name
+			case *parser.StringLit:
+				key = v.Value
+			}
+			if len(key) > MaxStringLen {
 				return c.error(node, ErrStringLimit)
 			}
 			c.emit(node, parser.OpConstant,
-				c.addConstant(&String{Value: elt.Key}))
+				c.addConstant(&String{Value: key}))
 
 			// value
 			if err := c.Compile(elt.Value); err != nil {

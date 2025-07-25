@@ -595,9 +595,9 @@ func TestParseForIn(t *testing.T) {
 				mapLit(
 					p(1, 13), p(1, 26),
 					mapElementLit(
-						"k1", p(1, 14), p(1, 16), intLit(1, p(1, 18))),
+						ident("k1", 14), p(1, 16), intLit(1, p(1, 18))),
 					mapElementLit(
-						"k2", p(1, 21), p(1, 23), intLit(2, p(1, 25)))),
+						ident("k2", 21), p(1, 23), intLit(2, p(1, 25)))),
 				blockStmt(p(1, 28), p(1, 29)),
 				p(1, 1)))
 	})
@@ -1105,9 +1105,9 @@ func TestParseIndex(t *testing.T) {
 				indexExpr(
 					mapLit(p(1, 1), p(1, 12),
 						mapElementLit(
-							"a", p(1, 2), p(1, 3), intLit(1, p(1, 5))),
+							ident("a", 2), p(1, 3), intLit(1, p(1, 5))),
 						mapElementLit(
-							"b", p(1, 8), p(1, 9), intLit(2, p(1, 11)))),
+							ident("b", 8), p(1, 9), intLit(2, p(1, 11)))),
 					stringLit("b", p(1, 14)),
 					p(1, 13), p(1, 17))))
 	})
@@ -1118,9 +1118,9 @@ func TestParseIndex(t *testing.T) {
 				indexExpr(
 					mapLit(p(1, 1), p(1, 12),
 						mapElementLit(
-							"a", p(1, 2), p(1, 3), intLit(1, p(1, 5))),
+							ident("a", 2), p(1, 3), intLit(1, p(1, 5))),
 						mapElementLit(
-							"b", p(1, 8), p(1, 9), intLit(2, p(1, 11)))),
+							ident("b", 8), p(1, 9), intLit(2, p(1, 11)))),
 					binaryExpr(
 						ident("a", p(1, 14)),
 						ident("b", p(1, 18)),
@@ -1182,11 +1182,11 @@ func TestParseMap(t *testing.T) {
 			exprStmt(
 				mapLit(p(1, 1), p(1, 34),
 					mapElementLit(
-						"key1", p(1, 3), p(1, 7), intLit(1, p(1, 9))),
+						ident("key1", 3), p(1, 7), intLit(1, p(1, 9))),
 					mapElementLit(
-						"key2", p(1, 12), p(1, 16), stringLit("2", p(1, 18))),
+						ident("key2", 12), p(1, 16), stringLit("2", p(1, 18))),
 					mapElementLit(
-						"key3", p(1, 23), p(1, 27), boolLit(true, p(1, 29))))))
+						ident("key3", 23), p(1, 27), boolLit(true, p(1, 29))))))
 	})
 
 	expectParse(t, "{ \"key1\": 1 }", func(p pfn) []Stmt {
@@ -1194,7 +1194,7 @@ func TestParseMap(t *testing.T) {
 			exprStmt(
 				mapLit(p(1, 1), p(1, 13),
 					mapElementLit(
-						"key1", p(1, 3), p(1, 9), intLit(1, p(1, 11))))))
+						stringLit("key1", 3), p(1, 9), intLit(1, p(1, 11))))))
 	})
 
 	expectParse(t, "a = { key1: 1, key2: \"2\", key3: true }",
@@ -1203,11 +1203,11 @@ func TestParseMap(t *testing.T) {
 				exprs(ident("a", p(1, 1))),
 				exprs(mapLit(p(1, 5), p(1, 38),
 					mapElementLit(
-						"key1", p(1, 7), p(1, 11), intLit(1, p(1, 13))),
+						ident("key1", 7), p(1, 11), intLit(1, p(1, 13))),
 					mapElementLit(
-						"key2", p(1, 16), p(1, 20), stringLit("2", p(1, 22))),
+						ident("key2", 16), p(1, 20), stringLit("2", p(1, 22))),
 					mapElementLit(
-						"key3", p(1, 27), p(1, 31), boolLit(true, p(1, 33))))),
+						ident("key3", 27), p(1, 31), boolLit(true, p(1, 33))))),
 				token.Assign,
 				p(1, 3)))
 		})
@@ -1218,17 +1218,17 @@ func TestParseMap(t *testing.T) {
 				exprs(ident("a", p(1, 1))),
 				exprs(mapLit(p(1, 5), p(1, 54),
 					mapElementLit(
-						"key1", p(1, 7), p(1, 11), intLit(1, p(1, 13))),
+						ident("key1", 7), p(1, 11), intLit(1, p(1, 13))),
 					mapElementLit(
-						"key2", p(1, 16), p(1, 20), stringLit("2", p(1, 22))),
+						ident("key2", 16), p(1, 20), stringLit("2", p(1, 22))),
 					mapElementLit(
-						"key3", p(1, 27), p(1, 31),
+						ident("key3", 27), p(1, 31),
 						mapLit(p(1, 33), p(1, 52),
 							mapElementLit(
-								"k1", p(1, 35),
+								ident("k1", 35),
 								p(1, 37), stringLit("bar", p(1, 39))),
 							mapElementLit(
-								"k2", p(1, 46),
+								ident("k2", 46),
 								p(1, 48), intLit(4, p(1, 50))))))),
 				token.Assign,
 				p(1, 3)))
@@ -1243,11 +1243,11 @@ func TestParseMap(t *testing.T) {
 		return stmts(exprStmt(
 			mapLit(p(2, 1), p(6, 1),
 				mapElementLit(
-					"key1", p(3, 2), p(3, 6), intLit(1, p(3, 8))),
+					ident("key1", 2), p(3, 6), intLit(1, p(3, 8))),
 				mapElementLit(
-					"key2", p(4, 2), p(4, 6), stringLit("2", p(4, 8))),
+					ident("key2", 2), p(4, 6), stringLit("2", p(4, 8))),
 				mapElementLit(
-					"key3", p(5, 2), p(5, 6), boolLit(true, p(5, 8))))))
+					ident("key3", 2), p(5, 6), boolLit(true, p(5, 8))))))
 	})
 
 	expectParseError(t, `
@@ -1296,7 +1296,7 @@ func TestParseSelector(t *testing.T) {
 					mapLit(
 						p(1, 1), p(1, 6),
 						mapElementLit(
-							"k1", p(1, 2), p(1, 4), intLit(1, p(1, 5)))),
+							ident("k1", 2), p(1, 4), intLit(1, p(1, 5)))),
 					stringLit("k1", p(1, 8)))))
 
 	})
@@ -1307,10 +1307,10 @@ func TestParseSelector(t *testing.T) {
 					selectorExpr(
 						mapLit(
 							p(1, 1), p(1, 11),
-							mapElementLit("k1", p(1, 2), p(1, 4),
+							mapElementLit(ident("k1", 2), p(1, 4),
 								mapLit(p(1, 5), p(1, 10),
 									mapElementLit(
-										"v1", p(1, 6),
+										ident("v1", 6),
 										p(1, 8), intLit(1, p(1, 9)))))),
 						stringLit("k1", p(1, 13))),
 					stringLit("v1", p(1, 16)))))
@@ -1908,13 +1908,12 @@ func arrayLit(lbracket, rbracket Pos, list ...Expr) *ArrayLit {
 }
 
 func mapElementLit(
-	key string,
-	keyPos Pos,
+	key Expr,
 	colonPos Pos,
 	value Expr,
 ) *MapElementLit {
 	return &MapElementLit{
-		Key: key, KeyPos: keyPos, ColonPos: colonPos, Value: value,
+		Key: key, ColonPos: colonPos, Value: value,
 	}
 }
 
@@ -2233,8 +2232,7 @@ func equalMapElements(
 ) {
 	require.Equal(t, len(expected), len(actual))
 	for i := 0; i < len(expected); i++ {
-		require.Equal(t, expected[i].Key, actual[i].Key)
-		require.Equal(t, expected[i].KeyPos, actual[i].KeyPos)
+		equalExpr(t, expected[i].Key, actual[i].Key)
 		require.Equal(t, expected[i].ColonPos, actual[i].ColonPos)
 		equalExpr(t, expected[i].Value, actual[i].Value)
 	}

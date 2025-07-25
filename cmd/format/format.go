@@ -271,7 +271,7 @@ func (p *printer) printIntLit(e *parser.IntLit) string {
 }
 
 func (p *printer) printMapElementLit(e *parser.MapElementLit) string {
-	return e.Key + ": " + p.printExpr(e.Value)
+	return p.printExpr(e.Key) + ": " + p.printExpr(e.Value)
 }
 
 func (p *printer) printMapLit(e *parser.MapLit) string {

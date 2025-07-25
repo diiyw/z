@@ -1041,13 +1041,23 @@ func (p *Parser) parseMapElementLit() *MapElementLit {
 	}
 
 	pos := p.pos
-	name := "_"
+	var name Expr = &Ident{
+		Name:    "_",
+		NamePos: pos,
+	}
 	switch p.token {
 	case token.Ident:
-		name = p.tokenLit
+		name = &Ident{
+			Name:    p.tokenLit,
+			NamePos: pos,
+		}
 	case token.String:
 		v, _ := strconv.Unquote(p.tokenLit)
-		name = v
+		name = &StringLit{
+			Value:    v,
+			ValuePos: pos,
+			Literal:  p.tokenLit,
+		}
 	default:
 		p.errorExpected(pos, "map key")
 	}
@@ -1056,7 +1066,6 @@ func (p *Parser) parseMapElementLit() *MapElementLit {
 	valueExpr := p.parseExpr()
 	return &MapElementLit{
 		Key:      name,
-		KeyPos:   pos,
 		ColonPos: colonPos,
 		Value:    valueExpr,
 	}
