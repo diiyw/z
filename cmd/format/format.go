@@ -53,9 +53,7 @@ func (p *printer) printAssignStmt(s *parser.AssignStmt) {
 }
 
 func (p *printer) printExportStmt(s *parser.ExportStmt) {
-	p.level++
 	result := p.printExpr(s.Result)
-	p.level--
 	p.printLine("export "+result, true)
 }
 
@@ -278,14 +276,17 @@ func (p *printer) printMapElementLit(e *parser.MapElementLit) string {
 
 func (p *printer) printMapLit(e *parser.MapLit) string {
 	var elements []string
+	p.level++
+	subSpaces := strings.Repeat("\t", p.level)
 	for _, m := range e.Elements {
-		elements = append(elements, p.printExpr(m))
+		elements = append(elements, strings.TrimSuffix(subSpaces+p.printExpr(m), "\n"))
 	}
+	p.level--
 	if len(elements) == 0 {
-		return "{\n}"
+		return "{}"
 	}
 	spaces := strings.Repeat("\t", p.level)
-	return "{\n\t" + strings.Join(elements, ",\n"+spaces) + "}"
+	return "{\n" + strings.Join(elements, ",\n") + "\n" + spaces + "}"
 }
 
 func (p *printer) printParenExpr(e *parser.ParenExpr) string {

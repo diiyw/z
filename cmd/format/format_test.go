@@ -36,7 +36,7 @@ func TestFormat(t *testing.T) {
 		{
 			name:     "assignment with spaces and export",
 			input:    "fmt:=import(\"fmt\")\nexport{}",
-			expected: "fmt := import(\"fmt\")\nexport {\n}",
+			expected: "fmt := import(\"fmt\")\nexport {}",
 		},
 		{
 			name: "assignment with spaces and export with function",
@@ -116,10 +116,13 @@ export {
 		},
 		{
 			name:  "multi level 1",
-			input: `for{for{for true{}}}`,
+			input: `for{for{for true{ m:={a:1}}}}`,
 			expected: `for {
 	for {
 		for true {
+			m := {
+				a: 1
+			}
 		}
 	}
 }`,
@@ -135,6 +138,20 @@ export {
 			print(1)
 		}
 	}
+}`,
+		},
+		{
+			name:     "array",
+			input:    `[x>1,1,2]`,
+			expected: `[x > 1, 1, 2]`,
+		},
+		{
+			name:  "map",
+			input: `{a:1,b:2,c:3}`,
+			expected: `{
+	a: 1,
+	b: 2,
+	c: 3
 }`,
 		},
 	}
