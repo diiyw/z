@@ -71,6 +71,72 @@ export {
 	}
 }`,
 		},
+		{
+			name:  "for statement",
+			input: `for {}`,
+			expected: `for {
+}`,
+		},
+		{
+			name:  "for statement with cond",
+			input: `for true{}`,
+			expected: `for true {
+}`,
+		},
+		{
+			name:  "for statement full",
+			input: `for i:=0;i<=10;i++{print(i)}`,
+			expected: `for i := 0; i <= 10; i++ {
+	print(i)
+}`,
+		},
+		{
+			name:  "if statement with cond",
+			input: `if x>1{}`,
+			expected: `if x > 1 {
+}`,
+		},
+		{
+			name:  "if statement with init and cond",
+			input: `if x:=1;x>1{}`,
+			expected: `if x := 1; x > 1 {
+}`,
+		},
+		{
+			name:  "for-in statement",
+			input: `for v in vv{}`,
+			expected: `for _, v in vv {
+}`,
+		},
+		{
+			name:  "for-in statement with key-value",
+			input: `for k,v in vv{}`,
+			expected: `for k, v in vv {
+}`,
+		},
+		{
+			name:  "multi level 1",
+			input: `for{for{for true{}}}`,
+			expected: `for {
+	for {
+		for true {
+		}
+	}
+}`,
+		},
+		{
+			name: "multi level 2",
+			input: `for{for{fmt:=import("fmt")
+			if true{print(1)}}}`,
+			expected: `for {
+	for {
+		fmt := import("fmt")
+		if true {
+			print(1)
+		}
+	}
+}`,
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

@@ -48,7 +48,7 @@ func (p *printer) printAssignStmt(s *parser.AssignStmt) {
 	for _, e := range s.RHS {
 		rhs = append(rhs, p.printExpr(e))
 	}
-	p.print(strings.Join(lhs, ", ")+" "+s.Token.String()+
+	p.printLine(strings.Join(lhs, ", ")+" "+s.Token.String()+
 		" "+strings.Join(rhs, ", "), true)
 }
 
@@ -56,59 +56,67 @@ func (p *printer) printExportStmt(s *parser.ExportStmt) {
 	p.level++
 	result := p.printExpr(s.Result)
 	p.level--
-	p.print("export "+result, true)
+	p.printLine("export "+result, true)
 }
 
 func (p *printer) printBlockStmt(s *parser.BlockStmt) {
-	p.print("{", false)
+	p.printLine("{", false)
 	if len(s.Stmts) > 0 {
 		p.level++
 		p.printStmts(s.Stmts)
 		p.level--
 	}
-	p.print("}", true)
+	p.printLine("}", true)
 }
 
 func (p *printer) printExprStmt(s *parser.ExprStmt) {
-	p.print(p.printExpr(s.Expr), true)
+	p.printLine(p.printExpr(s.Expr), true)
 }
 
 func (p *printer) printForInStmt(s *parser.ForInStmt) {
 	if s.Value != nil {
 		p.print("for "+p.printExpr(s.Key)+", "+p.printExpr(s.Value)+
-			" in "+p.printExpr(s.Iterable)+" ", true)
+			" in "+p.printExpr(s.Iterable)+" ", false)
 		p.printStmt(s.Body)
 		return
 	}
-	p.print("for "+p.printExpr(s.Key)+" in "+p.printExpr(s.Iterable)+" ", true)
+	p.printLine("for "+p.printExpr(s.Key)+" in "+p.printExpr(s.Iterable)+" ", true)
 	p.printStmt(s.Body)
-	return
 }
 
 func (p *printer) printForStmt(s *parser.ForStmt) {
 	var cond string
 	if s.Cond != nil {
-		cond = p.printExpr(s.Cond) + " "
+		cond = p.printExpr(s.Cond)
 	}
 	p.print("for ", true)
 	if s.Init != nil && s.Post != nil {
 		p.printStmt(s.Init)
-		p.print(" ; "+cond+" ; ", true)
+		p.trim()
+		p.printLine("; "+cond+"; ", false)
+		p.trim()
 		p.printStmt(s.Post)
+		p.trim()
+		p.print(" ", false)
 	} else {
-		p.print("for "+cond, true)
+		if cond != "" {
+			p.print(cond+" ", false)
+		}
 	}
-	p.printStmt(s.Body)
+	p.printBlockStmt(s.Body)
 }
 
 func (p *printer) printIfStmt(s *parser.IfStmt) {
 	p.print("if ", true)
 	if s.Init != nil {
 		p.printStmt(s.Init)
+		p.trim()
+		p.print("; ", false)
 	}
-	p.print(p.printExpr(s.Cond), true)
+	p.print(p.printExpr(s.Cond)+" ", false)
 	p.printStmt(s.Body)
 	if s.Else != nil {
+		p.trim()
 		p.print(" else ", true)
 		p.printStmt(s.Else)
 	}
@@ -116,16 +124,15 @@ func (p *printer) printIfStmt(s *parser.IfStmt) {
 
 func (p *printer) printIncDecStmt(s *parser.IncDecStmt) {
 	p.print(p.printExpr(s.Expr), true)
-	p.print(s.Token.String(), true)
+	p.printLine(s.Token.String(), true)
 }
 
 func (p *printer) printReturnStmt(s *parser.ReturnStmt) {
 	if s.Result != nil {
-		p.print("return "+p.printExpr(s.Result), true)
+		p.printLine("return "+p.printExpr(s.Result), true)
 		return
 	}
-	p.print("return", true)
-	return
+	p.printLine("return", true)
 }
 
 func (p *printer) printExpr(expr parser.Expr) string {
@@ -312,7 +319,18 @@ func (p *printer) printUndefinedLit(e *parser.UndefinedLit) string {
 	return e.String()
 }
 
+func (p *printer) trim() {
+	p.result = strings.TrimSuffix(p.result, "\n")
+}
+
 func (p *printer) print(v string, prefix bool) {
+	if prefix {
+		p.result += strings.Repeat("\t", p.level)
+	}
+	p.result += v
+}
+
+func (p *printer) printLine(v string, prefix bool) {
 	if prefix {
 		p.result += strings.Repeat("\t", p.level)
 	}
@@ -329,6 +347,6 @@ func Format(src []byte) (string, error) {
 	}
 	var pt = &printer{}
 	pt.printStmts(parsedFile.Stmts)
-	pt.result = strings.TrimSuffix(pt.result, "\n")
+	pt.trim()
 	return pt.result, nil
 }
