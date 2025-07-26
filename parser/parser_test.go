@@ -1243,11 +1243,11 @@ func TestParseMap(t *testing.T) {
 		return stmts(exprStmt(
 			mapLit(p(2, 1), p(6, 1),
 				mapElementLit(
-					ident("key1", 2), p(3, 6), intLit(1, p(3, 8))),
+					ident("key1", p(3, 2)), p(3, 6), intLit(1, p(3, 8))),
 				mapElementLit(
-					ident("key2", 2), p(4, 6), stringLit("2", p(4, 8))),
+					ident("key2", p(4, 2)), p(4, 6), stringLit("2", p(4, 8))),
 				mapElementLit(
-					ident("key3", 2), p(5, 6), boolLit(true, p(5, 8))))))
+					ident("key3", p(5, 2)), p(5, 6), boolLit(true, p(5, 8))))))
 	})
 
 	expectParseError(t, `
