@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -368,8 +369,8 @@ func handleFmtCommand() {
 
 		result, err := format.Format(input)
 		if err != nil {
-			// fmt.Fprintf(os.Stderr, "Format error: %s\n", err)
-			os.Exit(0)
+			fmt.Fprintf(os.Stderr, "Format error: %s\n", err)
+			os.Exit(1)
 		}
 		fmt.Print(result)
 	} else {
@@ -382,12 +383,12 @@ func handleFmtCommand() {
 		data, err := os.ReadFile(file)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error reading file: %s\n", err)
-			os.Exit(0)
+			os.Exit(1)
 		}
 		result, err := format.Format(data)
 		if err != nil {
-			// fmt.Fprintf(os.Stderr, "Format error: %s\n", err)
-			os.Exit(0)
+			fmt.Fprintf(os.Stderr, "Format error: %s\n", err)
+			os.Exit(1)
 		}
 		fmt.Print(result)
 	}
@@ -404,7 +405,8 @@ func handleCheckCommand() {
 	p := parser.NewParser(sourceFile, input, nil)
 	_, err = p.ParseFile()
 	if err != nil {
-		errList := err.(parser.ErrorList)
+		var errList parser.ErrorList
+		errors.As(err, &errList)
 		data, _ := json.Marshal(errList)
 		fmt.Println(string(data))
 	}

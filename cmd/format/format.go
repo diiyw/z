@@ -211,7 +211,7 @@ func (p *printer) printBoolLit(e *parser.BoolLit) string {
 func (p *printer) printCallExpr(e *parser.CallExpr) string {
 	var args []string
 	for _, e := range e.Args {
-		args = append(args, p.printExpr(e))
+		args = append(args, strings.TrimSuffix(p.printExpr(e), "\n"))
 	}
 	if len(args) > 0 && e.Ellipsis.IsValid() {
 		args[len(args)-1] = args[len(args)-1] + "..."
@@ -313,7 +313,7 @@ func (p *printer) printStringLit(e *parser.StringLit) string {
 }
 
 func (p *printer) printUnaryExpr(e *parser.UnaryExpr) string {
-	return "(" + e.Token.String() + p.printExpr(e.Expr) + ")"
+	return e.Token.String() + p.printExpr(e.Expr)
 }
 
 func (p *printer) printUndefinedLit(e *parser.UndefinedLit) string {

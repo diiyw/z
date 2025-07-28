@@ -163,6 +163,44 @@ export {
 	c: 3
 }`,
 		},
+		{
+			name: "map 3",
+			input: `event := import("event")
+audio := import("audio")
+state := {
+	audio: undefined,
+	playing: false
+}
+export {
+	constructor: func() {
+		event.onmouseup(event.MouseLeft, func(data) {
+			if !state.playing{
+				state.audio.play()
+				state.playing = true
+			}
+		}
+)
+		state.audio = audio("media/ragtime.mp3")
+	}
+}`,
+			expected: `event := import("event")
+audio := import("audio")
+state := {
+	audio: undefined,
+	playing: false
+}
+export {
+	constructor: func() {
+		event.onmouseup(event.MouseLeft, func(data) {
+			if !state.playing {
+				state.audio.play()
+				state.playing = true
+			}
+		})
+		state.audio = audio("media/ragtime.mp3")
+	}
+}`,
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
