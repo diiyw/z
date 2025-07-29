@@ -42,7 +42,7 @@ func OnDocumentFormatting() {
 	} else {
 		// Format from file (existing behavior)
 		if fmtFlags.NArg() < 1 {
-			fmt.Fprintln(os.Stderr, "Usage: z fmt <file>")
+			fmt.Fprintln(os.Stderr, "Usage: z formatting <file>")
 			os.Exit(1)
 		}
 		file := fmtFlags.Arg(0)
@@ -85,7 +85,7 @@ type DefinitionItem struct {
 }
 
 type Definition struct {
-	Import  string           `json:"imports"`
+	Import  string           `json:"import"`
 	Globals []DefinitionItem `json:"globals"`
 }
 
@@ -118,7 +118,7 @@ func OnDefinition(input []byte) {
 	}
 	var expr = findNode(parsedFile.Stmts, offset)
 	if e, ok := expr.(*parser.ImportExpr); ok {
-		def.Import = e.ModuleName
+		def.Import = e.ModuleName + ".z"
 	}
 	data, _ := json.Marshal(def)
 	os.Stdout.Write(data)
