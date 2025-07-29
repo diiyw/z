@@ -3,8 +3,6 @@ package main
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
-	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -13,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/diiyw/z"
-	"github.com/diiyw/z/cmd/format"
+	"github.com/diiyw/z/cmd/lsp"
 	"github.com/diiyw/z/parser"
 	"github.com/diiyw/z/stdlib"
 )
@@ -49,14 +47,18 @@ func main() {
 		return
 	}
 
-	// 新增 fmt 命令支持
-	if flag.NArg() > 0 && flag.Arg(0) == "fmt" {
-		handleFmtCommand()
+	if flag.NArg() > 0 && flag.Arg(0) == "formatting" {
+		lsp.OnDocumentFormatting()
 		return
 	}
 
-	if flag.NArg() > 0 && flag.Arg(0) == "check" {
-		handleCheckCommand()
+	if flag.NArg() > 0 && flag.Arg(0) == "diagnostic" {
+		lsp.OnDiagnostics()
+		return
+	}
+
+	if flag.NArg() > 0 && flag.Arg(0) == "definition" {
+		lsp.OnDefinition(nil)
 		return
 	}
 
@@ -279,15 +281,18 @@ func doHelp() {
 	fmt.Println("	z")
 	fmt.Println()
 	fmt.Println("	          Start Z REPL")
-	fmt.Println("	z fmt myapp.z")
+	fmt.Println("	z formatting myapp.z")
 	fmt.Println()
 	fmt.Println("	          Format z code (myapp.z)")
-	fmt.Println("	z fmt -text")
+	fmt.Println("	z formatting -text")
 	fmt.Println()
 	fmt.Println("	          Format z code from stdin")
-	fmt.Println("	z check")
+	fmt.Println("	z diagnostic")
 	fmt.Println()
-	fmt.Println("	          Check z code from stdin")
+	fmt.Println("	          Z code diagnostic from stdin")
+	fmt.Println("	z definition")
+	fmt.Println()
+	fmt.Println("	          Z code definition from stdin")
 	fmt.Println()
 	fmt.Println("	z myapp.z")
 	fmt.Println()
@@ -344,70 +349,4 @@ func basename(s string) string {
 		return s[:n]
 	}
 	return s
-}
-
-// handleFmtCommand handles the 'fmt' command for formatting Z code
-func handleFmtCommand() {
-	// Create a new flag set for the fmt command
-	fmtFlags := flag.NewFlagSet("fmt", flag.ExitOnError)
-	textFlag := fmtFlags.Bool("text", false, "Format Z code from text input")
-
-	// Parse flags starting from the second argument (after "fmt")
-	err := fmtFlags.Parse(flag.Args()[1:])
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error parsing flags: %s\n", err)
-		os.Exit(1)
-	}
-
-	if *textFlag {
-		// Format from stdin text input
-		input, err := io.ReadAll(os.Stdin)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error reading input: %s\n", err)
-			os.Exit(1)
-		}
-
-		result, err := format.Format(input)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Format error: %s\n", err)
-			os.Exit(1)
-		}
-		fmt.Print(result)
-	} else {
-		// Format from file (existing behavior)
-		if fmtFlags.NArg() < 1 {
-			fmt.Fprintln(os.Stderr, "Usage: z fmt <file>")
-			os.Exit(1)
-		}
-		file := fmtFlags.Arg(0)
-		data, err := os.ReadFile(file)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error reading file: %s\n", err)
-			os.Exit(1)
-		}
-		result, err := format.Format(data)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Format error: %s\n", err)
-			os.Exit(1)
-		}
-		fmt.Print(result)
-	}
-}
-
-func handleCheckCommand() {
-	input, err := io.ReadAll(os.Stdin)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading input: %s\n", err)
-		os.Exit(1)
-	}
-	fileSet := parser.NewFileSet()
-	sourceFile := fileSet.AddFile("fmt.z", -1, len(input))
-	p := parser.NewParser(sourceFile, input, nil)
-	_, err = p.ParseFile()
-	if err != nil {
-		var errList parser.ErrorList
-		errors.As(err, &errList)
-		data, _ := json.Marshal(errList)
-		fmt.Println(string(data))
-	}
 }
