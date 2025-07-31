@@ -121,7 +121,7 @@ func OnDefinition(input []byte) {
 		def.Import = DefinitionItem{
 			Name:  e.ModuleName + ".z",
 			Start: int(e.Pos()) + 7,
-			End:   int(e.End()),
+			End:   int(e.End()) - 3,
 		}
 	}
 	data, _ := json.Marshal(def)
