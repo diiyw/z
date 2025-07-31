@@ -85,8 +85,8 @@ type DefinitionItem struct {
 }
 
 type Definition struct {
-	Import  string           `json:"import"`
-	Globals []DefinitionItem `json:"globals"`
+	Import  DefinitionItem   `json:"import"`
+	Targets []DefinitionItem `json:"targets"`
 }
 
 func OnDefinition(input []byte) {
@@ -114,11 +114,15 @@ func OnDefinition(input []byte) {
 		os.Exit(0)
 	}
 	var def = &Definition{
-		Globals: make([]DefinitionItem, 0),
+		Targets: make([]DefinitionItem, 0),
 	}
 	var expr = findNode(parsedFile.Stmts, offset)
 	if e, ok := expr.(*parser.ImportExpr); ok {
-		def.Import = e.ModuleName + ".z"
+		def.Import = DefinitionItem{
+			Name:  e.ModuleName + ".z",
+			Start: int(e.Pos()) + 7,
+			End:   int(e.End()),
+		}
 	}
 	data, _ := json.Marshal(def)
 	os.Stdout.Write(data)
