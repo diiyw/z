@@ -1,10 +1,12 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/diiyw/z/cmd/format"
 	"github.com/diiyw/z/parser"
 	"github.com/tliron/commonlog"
 	"github.com/tliron/glsp"
@@ -35,6 +37,8 @@ func main() {
 		TextDocumentCompletion: onCompletionfunc,
 		CompletionItemResolve:  onCompletionResolveFunc,
 		TextDocumentDefinition: onDefinitionfunc,
+		TextDocumentFormatting: onFormattingFunc,
+		TextDocumentDidChange:  onContentChange,
 	}
 
 	server := server.NewServer(&handler, lsName, false)
@@ -122,6 +126,28 @@ var (
 	constants = []string{"true", "false", "undefined"}
 )
 
+func onFormattingFunc(context *glsp.Context, params *protocol.DocumentFormattingParams) ([]protocol.TextEdit, error) {
+	filename := strings.Replace(params.TextDocument.URI, "file://", "", -1)
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	result, err := format.Format(content)
+	if err != nil {
+		return nil, err
+	}
+	// 替换整个文档内容
+	return []protocol.TextEdit{
+		{
+			Range: protocol.Range{
+				Start: protocol.Position{},
+				End:   protocol.Position{}.EndOfLineIn(string(content)),
+			},
+			NewText: result,
+		},
+	}, nil
+}
+
 func onCompletionfunc(context *glsp.Context, params *protocol.CompletionParams) (any, error) {
 	keywordKind := protocol.CompletionItemKindKeyword
 	// 简单判断触发补全的上下文
@@ -134,11 +160,15 @@ func onCompletionfunc(context *glsp.Context, params *protocol.CompletionParams) 
 		})
 	}
 	funcKind := protocol.CompletionItemKindFunction
+	snippetFormat := protocol.InsertTextFormatSnippet
 	for _, f := range builtinFunctions {
+		text := f + `($1)`
 		items = append(items, protocol.CompletionItem{
-			Label: f,
-			Kind:  &funcKind,
-			Data:  "function-" + f,
+			Label:            f,
+			Kind:             &funcKind,
+			InsertText:       &text,
+			InsertTextFormat: &snippetFormat,
+			Data:             "function-" + f,
 		})
 	}
 	constKind := protocol.CompletionItemKindConstant
@@ -154,6 +184,46 @@ func onCompletionfunc(context *glsp.Context, params *protocol.CompletionParams) 
 
 func onCompletionResolveFunc(context *glsp.Context, params *protocol.CompletionItem) (*protocol.CompletionItem, error) {
 	return params, nil
+}
+
+func onContentChange(context *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
+	diagnostics := make([]protocol.Diagnostic, 0)
+	filename := strings.Replace(params.TextDocument.URI, "file://", "", -1)
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	fileSet := parser.NewFileSet()
+	sourceFile := fileSet.AddFile("diagnostics.z", -1, len(content))
+	p := parser.NewParser(sourceFile, content, nil)
+	_, err = p.ParseFile()
+	var errSeverity = protocol.DiagnosticSeverityError
+	sourceZ := "z"
+	if err != nil {
+		var errList parser.ErrorList
+		errors.As(err, &errList)
+		for _, el := range errList {
+			diagnostics = append(diagnostics, protocol.Diagnostic{
+				Severity: &errSeverity,
+				Range: protocol.Range{
+					Start: protocol.Position{
+						Line:      protocol.UInteger(el.Pos.Line - 1),
+						Character: protocol.UInteger(el.Pos.Column - 1),
+					},
+					End: protocol.Position{
+						Line:      protocol.UInteger(el.Pos.Line - 1),
+						Character: protocol.UInteger(el.Pos.Column),
+					},
+				},
+				Message: el.Error(),
+				Source:  &sourceZ,
+			})
+		}
+		if len(diagnostics) > 0 {
+			// TODO 发送诊断
+		}
+	}
+	return nil
 }
 
 func onDefinitionfunc(context *glsp.Context, params *protocol.DefinitionParams) (any, error) {
