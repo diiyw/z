@@ -123,35 +123,37 @@ var (
 )
 
 func onCompletionfunc(context *glsp.Context, params *protocol.CompletionParams) (any, error) {
+	keywordKind := protocol.CompletionItemKindKeyword
 	// 简单判断触发补全的上下文
 	items := []protocol.CompletionItem{}
 	for _, keyword := range keywords {
 		items = append(items, protocol.CompletionItem{
 			Label: keyword,
-			Kind:  protocol.CompletionItemKindKeyword,
+			Kind:  &keywordKind,
 			Data:  "keyword-" + keyword,
 		})
 	}
+	funcKind := protocol.CompletionItemKindFunction
 	for _, f := range builtinFunctions {
 		items = append(items, protocol.CompletionItem{
 			Label: f,
-			Kind:  &protocol.CompletionItemKindFunction,
+			Kind:  &funcKind,
 			Data:  "function-" + f,
 		})
 	}
-
+	constKind := protocol.CompletionItemKindConstant
 	for _, constant := range constants {
 		items = append(items, protocol.CompletionItem{
 			Label: constant,
-			Kind:  &protocol.CompletionItemKindConstant,
+			Kind:  &constKind,
 			Data:  "constant-" + constant,
 		})
 	}
 	return items, nil
 }
 
-func onCompletionResolveFunc(context *glsp.Context, item *protocol.CompletionItem) (any, error) {
-	return item, nil
+func onCompletionResolveFunc(context *glsp.Context, params *protocol.CompletionItem) (*protocol.CompletionItem, error) {
+	return params, nil
 }
 
 func onDefinitionfunc(context *glsp.Context, params *protocol.DefinitionParams) (any, error) {

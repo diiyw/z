@@ -1,8 +1,6 @@
 module github.com/diiyw/z
 
-go 1.24.4
-
-toolchain go1.24.5
+go 1.24.5
 
 require (
 	github.com/tliron/commonlog v0.2.20
