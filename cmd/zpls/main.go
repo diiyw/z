@@ -127,7 +127,7 @@ var (
 )
 
 func onFormattingFunc(context *glsp.Context, params *protocol.DocumentFormattingParams) ([]protocol.TextEdit, error) {
-	filename := strings.Replace(params.TextDocument.URI, "file://", "", -1)
+	filename := strings.ReplaceAll(params.TextDocument.URI, "file://", "")
 	content, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -188,7 +188,7 @@ func onCompletionResolveFunc(context *glsp.Context, params *protocol.CompletionI
 
 func onContentChange(context *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
 	diagnostics := make([]protocol.Diagnostic, 0)
-	filename := strings.Replace(params.TextDocument.URI, "file://", "", -1)
+	filename := strings.ReplaceAll(params.TextDocument.URI, "file://", "")
 	content, err := os.ReadFile(filename)
 	if err != nil {
 		return err
@@ -220,7 +220,11 @@ func onContentChange(context *glsp.Context, params *protocol.DidChangeTextDocume
 			})
 		}
 		if len(diagnostics) > 0 {
-			// TODO 发送诊断
+			// 发送诊断
+			context.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
+				URI:         params.TextDocument.URI,
+				Diagnostics: diagnostics,
+			})
 		}
 	}
 	return nil

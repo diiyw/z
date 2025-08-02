@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/diiyw/z"
-	"github.com/diiyw/z/cmd/lsp"
 	"github.com/diiyw/z/parser"
 	"github.com/diiyw/z/stdlib"
 )
@@ -44,21 +43,6 @@ func main() {
 		os.Exit(2)
 	} else if showVersion {
 		fmt.Println(version)
-		return
-	}
-
-	if flag.NArg() > 0 && flag.Arg(0) == "formatting" {
-		lsp.OnDocumentFormatting()
-		return
-	}
-
-	if flag.NArg() > 0 && flag.Arg(0) == "diagnostic" {
-		lsp.OnDiagnostics()
-		return
-	}
-
-	if flag.NArg() > 0 && flag.Arg(0) == "definition" {
-		lsp.OnDefinition(nil)
 		return
 	}
 
@@ -281,18 +265,6 @@ func doHelp() {
 	fmt.Println("	z")
 	fmt.Println()
 	fmt.Println("	          Start Z REPL")
-	fmt.Println("	z formatting myapp.z")
-	fmt.Println()
-	fmt.Println("	          Format z code (myapp.z)")
-	fmt.Println("	z formatting -text")
-	fmt.Println()
-	fmt.Println("	          Format z code from stdin")
-	fmt.Println("	z diagnostic")
-	fmt.Println()
-	fmt.Println("	          Z code diagnostic from stdin")
-	fmt.Println("	z definition")
-	fmt.Println()
-	fmt.Println("	          Z code definition from stdin")
 	fmt.Println()
 	fmt.Println("	z myapp.z")
 	fmt.Println()
