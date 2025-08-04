@@ -15,7 +15,6 @@ func onTextDocumentChange(context *glsp.Context, params *protocol.DidChangeTextD
 }
 
 func onDiagnostic(context *glsp.Context, uri string) error {
-	diagnostics := make([]protocol.Diagnostic, 0)
 	filename := strings.ReplaceAll(uri, "file://", "")
 	content := Document().GetText(uri)
 	var name = filepath.Base(filename)
@@ -25,6 +24,7 @@ func onDiagnostic(context *glsp.Context, uri string) error {
 	_, err := p.ParseFile()
 	var errSeverity = protocol.DiagnosticSeverityError
 	sourceZ := "z"
+	diagnostics := make([]protocol.Diagnostic, 0)
 	if err != nil {
 		var errList parser.ErrorList
 		errors.As(err, &errList)
@@ -45,14 +45,12 @@ func onDiagnostic(context *glsp.Context, uri string) error {
 				Source:  &sourceZ,
 			})
 		}
-		if len(diagnostics) > 0 {
-			// 发送诊断
-			context.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
-				URI:         uri,
-				Diagnostics: diagnostics,
-			})
-		}
 	}
+	// 发送诊断
+	context.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
+		URI:         uri,
+		Diagnostics: diagnostics,
+	})
 	return nil
 }
 

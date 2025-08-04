@@ -59,10 +59,10 @@ var (
 	constants = []string{"true", "false", "undefined"}
 )
 
-func onCompletionfunc(context *glsp.Context, params *protocol.CompletionParams) (any, error) {
+func onCompletionFunc(context *glsp.Context, params *protocol.CompletionParams) (any, error) {
 	keywordKind := protocol.CompletionItemKindKeyword
 	// 简单判断触发补全的上下文
-	items := []protocol.CompletionItem{}
+	var items []protocol.CompletionItem
 	for _, keyword := range keywords {
 		items = append(items, protocol.CompletionItem{
 			Label: keyword,

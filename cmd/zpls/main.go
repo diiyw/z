@@ -14,7 +14,7 @@ import (
 const lsName = "Z language"
 
 var (
-	version string = "1.0.0"
+	version = "1.0.0"
 	handler protocol.Handler
 )
 
@@ -39,8 +39,12 @@ func main() {
 			Document().Set(params.TextDocument.URI, params.TextDocument)
 			return nil
 		},
+		TextDocumentDidClose: func(context *glsp.Context, params *protocol.DidCloseTextDocumentParams) error {
+			Document().Delete(params.TextDocument.URI)
+			return nil
+		},
 		TextDocumentDidChange: func(context *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
-			uri := string(params.TextDocument.URI)
+			uri := params.TextDocument.URI
 			// 合并所有内容变更
 			text := getTextFromVersion(uri, params.ContentChanges)
 			doc := protocol.TextDocumentItem{
@@ -52,16 +56,17 @@ func main() {
 			Document().Set(uri, doc)
 			return onTextDocumentChange(context, params)
 		},
-		TextDocumentCompletion:         onCompletionfunc,
+		TextDocumentCompletion:         onCompletionFunc,
 		CompletionItemResolve:          onCompletionResolveFunc,
-		TextDocumentDefinition:         onDefinitionfunc,
+		TextDocumentDefinition:         onDefinitionFunc,
 		TextDocumentFormatting:         onFormattingFunc,
 		WorkspaceDidChangeWatchedFiles: onWorkspaceDidChangeWatchedFiles,
+		TextDocumentReferences:         onReferencesFunc,
 	}
 
-	server := server.NewServer(&handler, lsName, false)
+	lspServer := server.NewServer(&handler, lsName, false)
 
-	if err := server.RunTCP(":60066"); err != nil {
+	if err := lspServer.RunTCP(":60066"); err != nil {
 		panic(err)
 	}
 }

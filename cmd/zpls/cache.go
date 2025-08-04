@@ -7,38 +7,44 @@ import (
 )
 
 var (
-	cache *DocmentCache
+	cache *DocumentCache
 )
 
-type DocmentCache struct {
+type DocumentCache struct {
 	documents map[string]protocol.TextDocumentItem // uri -> document
 	mu        sync.RWMutex
 }
 
-func Document() *DocmentCache {
+func Document() *DocumentCache {
 	if cache != nil {
 		return cache
 	}
-	cache = &DocmentCache{
+	cache = &DocumentCache{
 		documents: make(map[string]protocol.TextDocumentItem),
 	}
 	return cache
 }
 
-func (c *DocmentCache) Set(uri string, doc protocol.TextDocumentItem) {
+func (c *DocumentCache) Set(uri string, doc protocol.TextDocumentItem) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.documents[uri] = doc
 }
 
-func (c *DocmentCache) Get(uri string) (protocol.TextDocumentItem, bool) {
+func (c *DocumentCache) Delete(uri string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	delete(c.documents, uri)
+}
+
+func (c *DocumentCache) Get(uri string) (protocol.TextDocumentItem, bool) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	doc, ok := c.documents[uri]
 	return doc, ok
 }
 
-func (c *DocmentCache) GetText(uri string) string {
+func (c *DocumentCache) GetText(uri string) string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	doc := c.documents[uri]

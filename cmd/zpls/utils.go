@@ -1,10 +1,52 @@
 package main
 
 import (
+	"runtime"
 	"strings"
 
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
+
+func creatURI(filename string) protocol.DocumentUri {
+	if runtime.GOOS == "windows" {
+		// 在Windows上，文件路径使用反斜杠，需要转换为正斜杠
+		filename = strings.ReplaceAll(filename, "\\", "/")
+	}
+	return "file://" + filename
+}
+
+func offsetToPosition(offset int, content string) protocol.Position {
+	lines := strings.Split(content, "\n")
+	line := 0
+	character := 0
+
+	for i, l := range lines {
+		if offset < len(l) {
+			line = i
+			character = offset
+			break
+		}
+		offset -= len(l) + 1 // +1 for the newline character
+	}
+
+	return protocol.Position{
+		Line:      uint32(line),
+		Character: uint32(character),
+	}
+}
+
+func createRange(startLine, startChar, endLine, endChar uint32) protocol.Range {
+	return protocol.Range{
+		Start: protocol.Position{
+			Line:      startLine,
+			Character: startChar,
+		},
+		End: protocol.Position{
+			Line:      endLine,
+			Character: endChar,
+		},
+	}
+}
 
 func fullFileRange(content string) protocol.Range {
 	lines := strings.Split(content, "\n")
