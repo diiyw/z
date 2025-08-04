@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -12,14 +11,12 @@ import (
 
 func onDefinitionfunc(context *glsp.Context, params *protocol.DefinitionParams) (any, error) {
 	filename := strings.ReplaceAll(params.TextDocument.URI, "file://", "")
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	offset := params.Position.IndexIn(string(content))
+	content := Document().GetText(params.TextDocument.URI)
+	offset := params.Position.IndexIn(content)
 	fileSet := parser.NewFileSet()
-	sourceFile := fileSet.AddFile("definition.z", -1, len(content))
-	p := parser.NewParser(sourceFile, content, nil)
+	basename := filepath.Base(filename)
+	sourceFile := fileSet.AddFile(basename, -1, len(content))
+	p := parser.NewParser(sourceFile, []byte(content), nil)
 	parsedFile, err := p.ParseFile()
 	if err != nil {
 		return nil, err

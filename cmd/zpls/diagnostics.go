@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/diiyw/z/parser"
@@ -10,17 +10,19 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
-func onContentChange(context *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
+func onTextDocumentChange(context *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
+	return onDiagnostic(context, params.TextDocument.URI)
+}
+
+func onDiagnostic(context *glsp.Context, uri string) error {
 	diagnostics := make([]protocol.Diagnostic, 0)
-	filename := strings.ReplaceAll(params.TextDocument.URI, "file://", "")
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		return err
-	}
+	filename := strings.ReplaceAll(uri, "file://", "")
+	content := Document().GetText(uri)
+	var name = filepath.Base(filename)
 	fileSet := parser.NewFileSet()
-	sourceFile := fileSet.AddFile("diagnostics.z", -1, len(content))
-	p := parser.NewParser(sourceFile, content, nil)
-	_, err = p.ParseFile()
+	sourceFile := fileSet.AddFile(name, -1, len(content))
+	p := parser.NewParser(sourceFile, []byte(content), nil)
+	_, err := p.ParseFile()
 	var errSeverity = protocol.DiagnosticSeverityError
 	sourceZ := "z"
 	if err != nil {
@@ -46,9 +48,21 @@ func onContentChange(context *glsp.Context, params *protocol.DidChangeTextDocume
 		if len(diagnostics) > 0 {
 			// 发送诊断
 			context.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
-				URI:         params.TextDocument.URI,
+				URI:         uri,
 				Diagnostics: diagnostics,
 			})
+		}
+	}
+	return nil
+}
+
+func onWorkspaceDidChangeWatchedFiles(context *glsp.Context, params *protocol.DidChangeWatchedFilesParams) error {
+	for _, change := range params.Changes {
+		if change.Type == protocol.FileChangeTypeDeleted {
+			continue
+		}
+		if err := onDiagnostic(context, change.URI); err != nil {
+			return err
 		}
 	}
 	return nil

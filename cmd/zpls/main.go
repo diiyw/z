@@ -21,7 +21,7 @@ var (
 func main() {
 	// This increases logging verbosity (optional)
 	commonlog.Configure(1, nil)
-
+	cache = Document()
 	handler = protocol.Handler{
 		Initialize: initialize,
 		Initialized: func(context *glsp.Context, params *protocol.InitializedParams) error {
@@ -35,16 +35,35 @@ func main() {
 			protocol.SetTraceValue(params.Value)
 			return nil
 		},
-		TextDocumentCompletion: onCompletionfunc,
-		CompletionItemResolve:  onCompletionResolveFunc,
-		TextDocumentDefinition: onDefinitionfunc,
-		TextDocumentFormatting: onFormattingFunc,
-		TextDocumentDidChange:  onContentChange,
+		TextDocumentDidOpen: func(context *glsp.Context, params *protocol.DidOpenTextDocumentParams) error {
+			Document().Set(params.TextDocument.URI, params.TextDocument)
+			return nil
+		},
+		TextDocumentDidChange: func(context *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
+			uri := string(params.TextDocument.URI)
+			// 合并所有内容变更
+			text := getTextFromVersion(uri, params.ContentChanges)
+			doc := protocol.TextDocumentItem{
+				URI:        params.TextDocument.URI,
+				LanguageID: params.TextDocument.TextDocumentIdentifier.URI,
+				Version:    params.TextDocument.Version,
+				Text:       text,
+			}
+			Document().Set(uri, doc)
+			return onTextDocumentChange(context, params)
+		},
+		TextDocumentCompletion:         onCompletionfunc,
+		CompletionItemResolve:          onCompletionResolveFunc,
+		TextDocumentDefinition:         onDefinitionfunc,
+		TextDocumentFormatting:         onFormattingFunc,
+		WorkspaceDidChangeWatchedFiles: onWorkspaceDidChangeWatchedFiles,
 	}
 
 	server := server.NewServer(&handler, lsName, false)
 
-	server.RunStdio()
+	if err := server.RunTCP(":60066"); err != nil {
+		panic(err)
+	}
 }
 
 func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, error) {
