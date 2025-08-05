@@ -21,15 +21,23 @@ func onReferencesFunc(context *glsp.Context, params *protocol.ReferenceParams) (
 	if err != nil {
 		return nil, err
 	}
-	var expr = findNode(parsedFile.Stmts, offset)
+	currentDir := filepath.Dir(filename)
+	var f = finder{currentDir: currentDir, offset: offset, filename: filename}
+	var expr = f.findNodeByOffset(parsedFile.Stmts)
 	var locations = make([]protocol.Location, 0)
-	if _, ok := expr.(*parser.SelectorExpr); ok {
-		locations = findReferences(filename, content, expr.(*parser.SelectorExpr), parsedFile.Stmts)
+	
+	// 处理标识符的引用查找
+	if ident, ok := expr.(*parser.Ident); ok {
+		locations = f.findReferences(ident, parsedFile)
 	}
+	
+	// 处理SelectorExpr，例如 module.variable 形式
+	if selExpr, ok := expr.(*parser.SelectorExpr); ok {
+		if sel, ok := selExpr.Sel.(*parser.Ident); ok {
+			locations = f.findSelectorReferences(selExpr, sel, parsedFile)
+		}
+	}
+	
 	return locations, nil
 }
 
-func findReferences(filename, content string, expr *parser.SelectorExpr, stmt []parser.Stmt) []protocol.Location {
-	locations := make([]protocol.Location, 0)
-	return locations
-}
