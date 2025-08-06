@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"path/filepath"
 	"strings"
 
 	"github.com/diiyw/z/parser"
@@ -17,11 +16,9 @@ func onTextDocumentChange(context *glsp.Context, params *protocol.DidChangeTextD
 func onDiagnostic(context *glsp.Context, uri string) error {
 	filename := strings.ReplaceAll(uri, "file://", "")
 	content := Document().GetText(uri)
-	var name = filepath.Base(filename)
-	fileSet := parser.NewFileSet()
-	sourceFile := fileSet.AddFile(name, -1, len(content))
-	p := parser.NewParser(sourceFile, []byte(content), nil)
-	_, err := p.ParseFile()
+
+	// 使用新的通用文件解析函数
+	_, err := ParseFileContent(filename, content)
 	var errSeverity = protocol.DiagnosticSeverityError
 	sourceZ := "z"
 	diagnostics := make([]protocol.Diagnostic, 0)

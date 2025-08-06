@@ -1,9 +1,11 @@
 package main
 
 import (
+	"path/filepath"
 	"runtime"
 	"strings"
 
+	"github.com/diiyw/z/parser"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 )
 
@@ -120,4 +122,18 @@ func applyChange(original string, change protocol.TextDocumentContentChangeEvent
 
 	// 组合变更前的文本、变更文本和变更后的文本
 	return before + change.Text + after
+}
+
+// ParseFile 解析指定路径的文件并返回解析后的AST
+func ParseFile(filename string, content []byte) (*parser.File, error) {
+	fileSet := parser.NewFileSet()
+	basename := filepath.Base(filename)
+	sourceFile := fileSet.AddFile(basename, -1, len(content))
+	p := parser.NewParser(sourceFile, content, nil)
+	return p.ParseFile()
+}
+
+// ParseFileContent 是一个新的通用文件解析函数
+func ParseFileContent(filename, content string) (*parser.File, error) {
+	return ParseFile(filename, []byte(content))
 }

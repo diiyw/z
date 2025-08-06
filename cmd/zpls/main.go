@@ -21,7 +21,6 @@ var (
 func main() {
 	// This increases logging verbosity (optional)
 	commonlog.Configure(1, nil)
-	cache = Document()
 	handler = protocol.Handler{
 		Initialize: initialize,
 		Initialized: func(context *glsp.Context, params *protocol.InitializedParams) error {
@@ -57,7 +56,6 @@ func main() {
 			return onTextDocumentChange(context, params)
 		},
 		TextDocumentCompletion:         onCompletionFunc,
-		CompletionItemResolve:          onCompletionResolveFunc,
 		TextDocumentDefinition:         onDefinitionFunc,
 		TextDocumentFormatting:         onFormattingFunc,
 		WorkspaceDidChangeWatchedFiles: onWorkspaceDidChangeWatchedFiles,

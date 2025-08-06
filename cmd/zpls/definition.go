@@ -14,14 +14,13 @@ func onDefinitionFunc(context *glsp.Context, params *protocol.DefinitionParams) 
 	filename := strings.ReplaceAll(params.TextDocument.URI, "file://", "")
 	content := Document().GetText(params.TextDocument.URI)
 	offset := params.Position.IndexIn(content)
-	fileSet := parser.NewFileSet()
-	basename := filepath.Base(filename)
-	sourceFile := fileSet.AddFile(basename, -1, len(content))
-	p := parser.NewParser(sourceFile, []byte(content), nil)
-	parsedFile, err := p.ParseFile()
+
+	// 使用新的通用文件解析函数
+	parsedFile, err := ParseFileContent(filename, content)
 	if err != nil {
 		return nil, err
 	}
+
 	currentDir := filepath.Dir(filename)
 	var f = finder{currentDir: currentDir, offset: offset, filename: filename}
 	var expr = f.findNodeByOffset(parsedFile.Stmts)
@@ -38,7 +37,7 @@ func onDefinitionFunc(context *glsp.Context, params *protocol.DefinitionParams) 
 		})
 	}
 	if e, ok := expr.(*parser.Ident); ok {
-		locationLinks = f.findDefinition(e, parsedFile)
+		locationLinks = f.findDefinitionInScopes(e, parsedFile.Stmts)
 	}
 
 	// 处理SelectorExpr，例如 module.variable 形式
@@ -55,21 +54,6 @@ type finder struct {
 	currentDir string
 	filename   string
 	offset     int
-}
-
-func (f *finder) findDefinition(expr *parser.Ident, file *parser.File) []protocol.LocationLink {
-	// 首先在当前文件中查找定义
-	locations := f.findDefinitionInScopes(expr, file.Stmts)
-
-	// 如果在当前文件中找到了定义，则直接返回
-	if len(locations) > 0 {
-		return locations
-	}
-
-	// 如果在当前文件中没找到，检查是否是模块.标识符的形式
-	// 这部分逻辑可以在后续扩展
-
-	return locations
 }
 
 // findSelectorDefinition 处理 selector 表达式，例如 module.variable
@@ -109,6 +93,126 @@ func (f *finder) findImportedFile(moduleName string, stmts []parser.Stmt) string
 	return ""
 }
 
+// DefinitionCollector 实现TraverserHandler接口，用于收集定义
+type DefinitionCollector struct {
+	targetIdent *parser.Ident
+	locations   *[]protocol.LocationLink
+	filename    string
+	content     string
+}
+
+// NewDefinitionCollector 创建一个新的DefinitionCollector
+func NewDefinitionCollector(targetIdent *parser.Ident, locations *[]protocol.LocationLink, filename, content string) *DefinitionCollector {
+	return &DefinitionCollector{
+		targetIdent: targetIdent,
+		locations:   locations,
+		filename:    filename,
+		content:     content,
+	}
+}
+
+func (dc *DefinitionCollector) HandleAssignStmt(stmt *parser.AssignStmt, scope *scopeStack) {
+	// 添加左侧的变量到当前作用域
+	for _, lh := range stmt.LHS {
+		if ident, ok := lh.(*parser.Ident); ok {
+			scope.addVariable(ident.Name)
+			// 检查是否是我们要查找的标识符
+			if ident.Name == dc.targetIdent.Name {
+				*dc.locations = append(*dc.locations, protocol.LocationLink{
+					OriginSelectionRange: &protocol.Range{
+						Start: offsetToPosition(int(dc.targetIdent.Pos()-1), dc.content),
+						End:   offsetToPosition(int(dc.targetIdent.End()-1), dc.content),
+					},
+					TargetRange: protocol.Range{
+						Start: offsetToPosition(int(ident.Pos()-1), dc.content),
+						End:   offsetToPosition(int(ident.End()-1), dc.content),
+					},
+					TargetSelectionRange: protocol.Range{
+						Start: offsetToPosition(int(ident.Pos()-1), dc.content),
+						End:   offsetToPosition(int(ident.End()-1), dc.content),
+					},
+					TargetURI: creatURI(dc.filename),
+				})
+			}
+		}
+	}
+}
+
+func (dc *DefinitionCollector) HandleBlockStmt(stmt *parser.BlockStmt, scope *scopeStack) {
+	// 空实现
+}
+
+func (dc *DefinitionCollector) HandleFuncLit(stmt *parser.FuncLit, scope *scopeStack) {
+	// 添加参数到作用域
+	if stmt.Type.Params != nil {
+		for _, param := range stmt.Type.Params.List {
+			scope.addVariable(param.Name)
+			if param.Name == dc.targetIdent.Name {
+				*dc.locations = append(*dc.locations, protocol.LocationLink{
+					OriginSelectionRange: &protocol.Range{
+						Start: offsetToPosition(int(dc.targetIdent.Pos()-1), dc.content),
+						End:   offsetToPosition(int(dc.targetIdent.End()-1), dc.content),
+					},
+					TargetRange: protocol.Range{
+						Start: offsetToPosition(int(param.Pos()-1), dc.content),
+						End:   offsetToPosition(int(param.End()-1), dc.content),
+					},
+					TargetSelectionRange: protocol.Range{
+						Start: offsetToPosition(int(param.Pos()-1), dc.content),
+						End:   offsetToPosition(int(param.End()-1), dc.content),
+					},
+					TargetURI: creatURI(dc.filename),
+				})
+			}
+		}
+	}
+}
+
+func (dc *DefinitionCollector) HandleForInStmt(stmt *parser.ForInStmt, scope *scopeStack) {
+	// 添加key和value到作用域
+	scope.addVariable(stmt.Key.Name)
+	if stmt.Key.Name == dc.targetIdent.Name {
+		*dc.locations = append(*dc.locations, protocol.LocationLink{
+			OriginSelectionRange: &protocol.Range{
+				Start: offsetToPosition(int(dc.targetIdent.Pos()-1), dc.content),
+				End:   offsetToPosition(int(dc.targetIdent.End()-1), dc.content),
+			},
+			TargetRange: protocol.Range{
+				Start: offsetToPosition(int(stmt.Key.Pos()-1), dc.content),
+				End:   offsetToPosition(int(stmt.Key.End()-1), dc.content),
+			},
+			TargetSelectionRange: protocol.Range{
+				Start: offsetToPosition(int(stmt.Key.Pos()-1), dc.content),
+				End:   offsetToPosition(int(stmt.Key.End()-1), dc.content),
+			},
+			TargetURI: creatURI(dc.filename),
+		})
+	}
+
+	scope.addVariable(stmt.Value.Name)
+	if stmt.Value.Name == dc.targetIdent.Name {
+		*dc.locations = append(*dc.locations, protocol.LocationLink{
+			OriginSelectionRange: &protocol.Range{
+				Start: offsetToPosition(int(dc.targetIdent.Pos()-1), dc.content),
+				End:   offsetToPosition(int(dc.targetIdent.End()-1), dc.content),
+			},
+			TargetRange: protocol.Range{
+				Start: offsetToPosition(int(stmt.Value.Pos()-1), dc.content),
+				End:   offsetToPosition(int(stmt.Value.End()-1), dc.content),
+			},
+			TargetSelectionRange: protocol.Range{
+				Start: offsetToPosition(int(stmt.Value.Pos()-1), dc.content),
+				End:   offsetToPosition(int(stmt.Value.End()-1), dc.content),
+			},
+			TargetURI: creatURI(dc.filename),
+		})
+	}
+}
+
+func (dc *DefinitionCollector) HandleIdent(ident *parser.Ident, scope *scopeStack) {
+	// 空实现
+}
+
 // findDefinitionInScopes 在作用域中查找定义，考虑块级作用域
 func (f *finder) findDefinitionInScopes(expr *parser.Ident, stmts []parser.Stmt) []protocol.LocationLink {
 	locations := make([]protocol.LocationLink, 0)
@@ -116,140 +220,13 @@ func (f *finder) findDefinitionInScopes(expr *parser.Ident, stmts []parser.Stmt)
 	// 创建一个作用域栈来追踪变量定义
 	scopeStack := newScopeStack()
 
-	// 在当前作用域中查找定义
-	f.collectDefinitionsInScopes(expr, stmts, scopeStack, &locations)
+	// 使用新的遍历器查找定义
+	content := Document().GetText(creatURI(f.filename))
+	definitionCollector := NewDefinitionCollector(expr, &locations, f.filename, content)
+	traverser := NewTraverser(definitionCollector)
+	traverser.TraverseStmts(stmts, scopeStack)
 
 	return locations
-}
-
-// scopeStack 作用域栈，用于管理变量定义的作用域
-type scopeStack struct {
-	scopes [][]string // 每个作用域中的变量名
-}
-
-func newScopeStack() *scopeStack {
-	return &scopeStack{
-		scopes: make([][]string, 0),
-	}
-}
-
-func (s *scopeStack) pushScope() {
-	s.scopes = append(s.scopes, make([]string, 0))
-}
-
-func (s *scopeStack) popScope() {
-	if len(s.scopes) > 0 {
-		s.scopes = s.scopes[:len(s.scopes)-1]
-	}
-}
-
-func (s *scopeStack) addVariable(name string) {
-	if len(s.scopes) > 0 {
-		s.scopes[len(s.scopes)-1] = append(s.scopes[len(s.scopes)-1], name)
-	}
-}
-
-func (s *scopeStack) isVariableInScope(name string) bool {
-	// 从内到外检查作用域
-	for i := len(s.scopes) - 1; i >= 0; i-- {
-		scope := s.scopes[i]
-		for _, variable := range scope {
-			if variable == name {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-// collectDefinitionsInScopes 收集作用域中的定义
-func (f *finder) collectDefinitionsInScopes(expr *parser.Ident, stmts []parser.Stmt, scopeStack *scopeStack, locations *[]protocol.LocationLink) {
-	content := Document().GetText(creatURI(f.filename))
-
-	for _, stmt := range stmts {
-		switch s := stmt.(type) {
-		case *parser.AssignStmt:
-			// 添加左侧的变量到当前作用域
-			for _, lh := range s.LHS {
-				if ident, ok := lh.(*parser.Ident); ok {
-					scopeStack.addVariable(ident.Name)
-					// 检查是否是我们要查找的标识符
-					if ident.Name == expr.Name {
-						*locations = append(*locations, protocol.LocationLink{
-							OriginSelectionRange: &protocol.Range{
-								Start: offsetToPosition(int(expr.Pos()-1), content),
-								End:   offsetToPosition(int(expr.End()-1), content),
-							},
-							TargetRange: protocol.Range{
-								Start: offsetToPosition(int(ident.Pos()-1), content),
-								End:   offsetToPosition(int(ident.End()-1), content),
-							},
-							TargetSelectionRange: protocol.Range{
-								Start: offsetToPosition(int(ident.Pos()-1), content),
-								End:   offsetToPosition(int(ident.End()-1), content),
-							},
-							TargetURI: creatURI(f.filename),
-						})
-					}
-				}
-			}
-		case *parser.BlockStmt:
-			// 推入新的作用域
-			scopeStack.pushScope()
-			// 在块中递归查找
-			f.collectDefinitionsInScopes(expr, s.Stmts, scopeStack, locations)
-			// 弹出作用域
-			scopeStack.popScope()
-		case *parser.ForInStmt:
-			// for-in语句创建新的作用域
-			scopeStack.pushScope()
-			// 添加key和value到作用域
-			scopeStack.addVariable(s.Key.Name)
-			if s.Key.Name == expr.Name {
-				content := Document().GetText(creatURI(f.filename))
-				*locations = append(*locations, protocol.LocationLink{
-					OriginSelectionRange: &protocol.Range{
-						Start: offsetToPosition(int(expr.Pos()-1), content),
-						End:   offsetToPosition(int(expr.End()-1), content),
-					},
-					TargetRange: protocol.Range{
-						Start: offsetToPosition(int(s.Key.Pos()-1), content),
-						End:   offsetToPosition(int(s.Key.End()-1), content),
-					},
-					TargetSelectionRange: protocol.Range{
-						Start: offsetToPosition(int(s.Key.Pos()-1), content),
-						End:   offsetToPosition(int(s.Key.End()-1), content),
-					},
-					TargetURI: creatURI(f.filename),
-				})
-			}
-
-			scopeStack.addVariable(s.Value.Name)
-			if s.Value.Name == expr.Name {
-				content := Document().GetText(creatURI(f.filename))
-				*locations = append(*locations, protocol.LocationLink{
-					OriginSelectionRange: &protocol.Range{
-						Start: offsetToPosition(int(expr.Pos()-1), content),
-						End:   offsetToPosition(int(expr.End()-1), content),
-					},
-					TargetRange: protocol.Range{
-						Start: offsetToPosition(int(s.Value.Pos()-1), content),
-						End:   offsetToPosition(int(s.Value.End()-1), content),
-					},
-					TargetSelectionRange: protocol.Range{
-						Start: offsetToPosition(int(s.Value.Pos()-1), content),
-						End:   offsetToPosition(int(s.Value.End()-1), content),
-					},
-					TargetURI: creatURI(f.filename),
-				})
-			}
-
-			// 在循环体中递归查找
-			f.collectDefinitionsInScopes(expr, s.Body.Stmts, scopeStack, locations)
-			// 弹出作用域
-			scopeStack.popScope()
-		}
-	}
 }
 
 func (f *finder) findNodeByOffset(stmts []parser.Stmt) parser.Expr {
@@ -459,23 +436,8 @@ func (f *finder) findExprNode(expr parser.Expr) parser.Expr {
 
 // findDefinitionInFile 在指定文件中查找标识符定义
 func (f *finder) findDefinitionInFile(expr *parser.Ident, filename string) []protocol.LocationLink {
-	// 检查文件是否存在
-	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		return []protocol.LocationLink{}
-	}
-
-	// 读取文件内容
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		return []protocol.LocationLink{}
-	}
-
-	// 解析文件
-	fileSet := parser.NewFileSet()
-	basename := filepath.Base(filename)
-	sourceFile := fileSet.AddFile(basename, -1, len(content))
-	p := parser.NewParser(sourceFile, content, nil)
-	parsedFile, err := p.ParseFile()
+	// 使用通用文件解析函数获取解析后的文件
+	parsedFile, err := f.parseFile(filename)
 	if err != nil {
 		return []protocol.LocationLink{}
 	}
@@ -487,17 +449,17 @@ func (f *finder) findDefinitionInFile(expr *parser.Ident, filename string) []pro
 // 以下是从references.go移动过来的方法
 func (f *finder) findReferences(expr *parser.Ident, file *parser.File) []protocol.Location {
 	locations := make([]protocol.Location, 0)
-	
+
 	// 查找当前文件中的引用
 	locations = append(locations, f.findReferencesInScopes(expr, file.Stmts)...)
-	
+
 	return locations
 }
 
 // findSelectorReferences 处理 selector 表达式，例如 module.variable 的引用查找
 func (f *finder) findSelectorReferences(expr *parser.SelectorExpr, sel *parser.Ident, file *parser.File) []protocol.Location {
 	locations := make([]protocol.Location, 0)
-	
+
 	// 检查表达式的Expr部分是否为标识符
 	if ident, ok := expr.Expr.(*parser.Ident); ok {
 		// 查找模块导入
@@ -508,24 +470,24 @@ func (f *finder) findSelectorReferences(expr *parser.SelectorExpr, sel *parser.I
 			locations = append(locations, references...)
 		}
 	}
-	
+
 	return locations
 }
 
 // findReferencesInScopes 在作用域中查找引用
 func (f *finder) findReferencesInScopes(expr *parser.Ident, stmts []parser.Stmt) []protocol.Location {
 	locations := make([]protocol.Location, 0)
-	
+
 	// 收集所有引用
 	f.collectReferences(expr, stmts, &locations)
-	
+
 	return locations
 }
 
 // collectReferences 收集引用
 func (f *finder) collectReferences(expr *parser.Ident, stmts []parser.Stmt, locations *[]protocol.Location) {
 	content := Document().GetText(creatURI(f.filename))
-	
+
 	for _, stmt := range stmts {
 		switch s := stmt.(type) {
 		case *parser.AssignStmt:
@@ -583,7 +545,7 @@ func (f *finder) findExprReferences(target *parser.Ident, expr parser.Expr, loca
 	if expr == nil {
 		return
 	}
-	
+
 	switch e := expr.(type) {
 	case *parser.Ident:
 		if e.Name == target.Name {
@@ -648,7 +610,7 @@ func (f *finder) findStmtReferences(target *parser.Ident, stmt parser.Stmt, loca
 	if stmt == nil {
 		return
 	}
-	
+
 	// 处理不同类型的语句
 	switch s := stmt.(type) {
 	case *parser.AssignStmt:
@@ -668,23 +630,25 @@ func (f *finder) findReferencesInFile(expr *parser.Ident, filename string) []pro
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
 		return []protocol.Location{}
 	}
-	
+
+	// 使用通用文件解析函数获取解析后的文件
+	parsedFile, err := f.parseFile(filename)
+	if err != nil {
+		return []protocol.Location{}
+	}
+
+	// 在解析后的文件中查找引用
+	return f.findReferencesInScopes(expr, parsedFile.Stmts)
+}
+
+// parseFile 是一个辅助方法，用于封装文件的读取和解析
+func (f *finder) parseFile(filename string) (*parser.File, error) {
 	// 读取文件内容
 	content, err := os.ReadFile(filename)
 	if err != nil {
-		return []protocol.Location{}
+		return nil, err
 	}
-	
-	// 解析文件
-	fileSet := parser.NewFileSet()
-	basename := filepath.Base(filename)
-	sourceFile := fileSet.AddFile(basename, -1, len(content))
-	p := parser.NewParser(sourceFile, content, nil)
-	parsedFile, err := p.ParseFile()
-	if err != nil {
-		return []protocol.Location{}
-	}
-	
-	// 在解析后的文件中查找引用
-	return f.findReferencesInScopes(expr, parsedFile.Stmts)
+
+	// 使用新的通用文件解析函数
+	return ParseFileContent(filename, string(content))
 }
