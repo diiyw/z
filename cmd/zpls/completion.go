@@ -66,6 +66,7 @@ var (
 
 // VariableCollector 实现TraverserHandler接口，用于收集变量
 type VariableCollector struct {
+	BaseTraverserHandler
 	variables *[]string
 	varMap    map[string]bool
 }

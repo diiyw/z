@@ -11,12 +11,34 @@ type TraverserHandler interface {
 	HandleFuncLit(*parser.FuncLit, *scopeStack)
 	HandleForInStmt(*parser.ForInStmt, *scopeStack)
 	HandleIdent(*parser.Ident, *scopeStack)
+	HandleSelectorExpr(*parser.SelectorExpr, *scopeStack)
 }
 
 // Traverser 用于遍历AST
 type Traverser struct {
 	handler TraverserHandler
 }
+
+// BaseTraverserHandler 提供TraverserHandler接口的空实现
+type BaseTraverserHandler struct{}
+
+// HandleAssignStmt 提供空实现
+func (b *BaseTraverserHandler) HandleAssignStmt(stmt *parser.AssignStmt, scope *scopeStack) {}
+
+// HandleBlockStmt 提供空实现
+func (b *BaseTraverserHandler) HandleBlockStmt(stmt *parser.BlockStmt, scope *scopeStack) {}
+
+// HandleFuncLit 提供空实现
+func (b *BaseTraverserHandler) HandleFuncLit(lit *parser.FuncLit, scope *scopeStack) {}
+
+// HandleForInStmt 提供空实现
+func (b *BaseTraverserHandler) HandleForInStmt(stmt *parser.ForInStmt, scope *scopeStack) {}
+
+// HandleIdent 提供空实现
+func (b *BaseTraverserHandler) HandleIdent(ident *parser.Ident, scope *scopeStack) {}
+
+// HandleSelectorExpr 提供空实现
+func (b *BaseTraverserHandler) HandleSelectorExpr(expr *parser.SelectorExpr, scope *scopeStack) {}
 
 // NewTraverser 创建一个新的Traverser
 func NewTraverser(handler TraverserHandler) *Traverser {
@@ -125,9 +147,6 @@ func (t *Traverser) TraverseExpr(expr parser.Expr, scope *scopeStack) {
 	case *parser.IndexExpr:
 		t.TraverseExpr(e.Expr, scope)
 		t.TraverseExpr(e.Index, scope)
-	case *parser.MapElementLit:
-		t.TraverseExpr(e.Key, scope)
-		t.TraverseExpr(e.Value, scope)
 	case *parser.MapLit:
 		for _, element := range e.Elements {
 			t.TraverseExpr(element, scope)
@@ -137,6 +156,7 @@ func (t *Traverser) TraverseExpr(expr parser.Expr, scope *scopeStack) {
 	case *parser.SelectorExpr:
 		t.TraverseExpr(e.Expr, scope)
 		t.TraverseExpr(e.Sel, scope)
+		t.handler.HandleSelectorExpr(e, scope)
 	case *parser.SliceExpr:
 		t.TraverseExpr(e.Expr, scope)
 		if e.Low != nil {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -11,6 +12,7 @@ import (
 
 // ReferenceCollector 实现TraverserHandler接口，用于收集引用
 type ReferenceCollector struct {
+	BaseTraverserHandler
 	targetIdent *parser.Ident
 	locations   *[]protocol.Location
 	filename    string
@@ -25,22 +27,6 @@ func NewReferenceCollector(targetIdent *parser.Ident, locations *[]protocol.Loca
 		filename:    filename,
 		content:     content,
 	}
-}
-
-func (rc *ReferenceCollector) HandleAssignStmt(stmt *parser.AssignStmt, scope *scopeStack) {
-	// 空实现 - 引用收集在HandleIdent中处理
-}
-
-func (rc *ReferenceCollector) HandleBlockStmt(stmt *parser.BlockStmt, scope *scopeStack) {
-	// 空实现
-}
-
-func (rc *ReferenceCollector) HandleFuncLit(stmt *parser.FuncLit, scope *scopeStack) {
-	// 空实现 - 引用收集在HandleIdent中处理
-}
-
-func (rc *ReferenceCollector) HandleForInStmt(stmt *parser.ForInStmt, scope *scopeStack) {
-	// 空实现 - 引用收集在HandleIdent中处理
 }
 
 func (rc *ReferenceCollector) HandleIdent(ident *parser.Ident, scope *scopeStack) {
@@ -67,8 +53,14 @@ func onReferencesFunc(context *glsp.Context, params *protocol.ReferenceParams) (
 	}
 
 	currentDir := filepath.Dir(filename)
-	var f = finder{currentDir: currentDir, offset: offset, filename: filename}
-	var expr = f.findNodeByOffset(parsedFile.Stmts)
+
+	// 使用Traverser方式查找节点
+	nodeFinder := NewNodeFinder(offset)
+	scopeStack := newScopeStack()
+	traverser := NewTraverser(nodeFinder)
+	traverser.TraverseStmts(parsedFile.Stmts, scopeStack)
+
+	var expr = nodeFinder.GetNode()
 	var locations = make([]protocol.Location, 0)
 
 	// 处理标识符的引用查找
@@ -77,12 +69,12 @@ func onReferencesFunc(context *glsp.Context, params *protocol.ReferenceParams) (
 		scopeStack := newScopeStack()
 
 		// 直接使用ReferenceCollector进行遍历
-		referenceCollector := NewReferenceCollector(ident, &locations, f.filename, content)
+		referenceCollector := NewReferenceCollector(ident, &locations, filename, content)
 		traverser := NewTraverser(referenceCollector)
 		traverser.TraverseStmts(parsedFile.Stmts, scopeStack)
 
 		locations = append(locations, protocol.Location{
-			URI: creatURI(f.filename),
+			URI: creatURI(filename),
 			Range: protocol.Range{
 				Start: offsetToPosition(int(ident.Pos()-1), content),
 				End:   offsetToPosition(int(ident.End()-1), content),
@@ -93,9 +85,67 @@ func onReferencesFunc(context *glsp.Context, params *protocol.ReferenceParams) (
 	// 处理SelectorExpr，例如 module.variable 形式
 	if selExpr, ok := expr.(*parser.SelectorExpr); ok {
 		if sel, ok := selExpr.Sel.(*parser.Ident); ok {
-			locations = f.findSelectorReferences(selExpr, sel, parsedFile)
+			locations = findSelectorReferences(selExpr, sel, parsedFile, currentDir)
 		}
 	}
 
 	return locations, nil
+}
+
+// findSelectorReferences 处理 selector 表达式，例如 module.variable 的引用查找
+func findSelectorReferences(expr *parser.SelectorExpr, sel *parser.Ident, file *parser.File, currentDir string) []protocol.Location {
+	locations := make([]protocol.Location, 0)
+
+	// 检查表达式的Expr部分是否为标识符
+	if ident, ok := expr.Expr.(*parser.Ident); ok {
+		// 查找模块导入
+		importedFile := findImportedFile(ident.Name, file.Stmts, currentDir)
+		if importedFile != "" {
+			// 在导入的文件中查找引用
+			references := findReferencesInFile(sel, importedFile)
+			locations = append(locations, references...)
+		}
+	}
+
+	return locations
+}
+
+// findReferencesInFile 在指定文件中查找标识符引用
+func findReferencesInFile(expr *parser.Ident, filename string) []protocol.Location {
+	// 使用通用文件解析函数获取解析后的文件
+	parsedFile, err := parseFile(filename)
+	if err != nil {
+		return []protocol.Location{}
+	}
+
+	// 在解析后的文件中查找引用
+	return findReferencesInScopes(expr, parsedFile.Stmts, filename)
+}
+
+// parseFile 是一个辅助方法，用于封装文件的读取和解析
+func parseFile(filename string) (*parser.File, error) {
+	// 读取文件内容
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	// 使用新的通用文件解析函数
+	return ParseFileContent(filename, string(content))
+}
+
+// findReferencesInScopes 在作用域中查找引用
+func findReferencesInScopes(expr *parser.Ident, stmts []parser.Stmt, filename string) []protocol.Location {
+	locations := make([]protocol.Location, 0)
+
+	// 创建一个作用域栈来追踪变量定义
+	scopeStack := newScopeStack()
+
+	// 使用新的遍历器查找引用
+	content := Document().GetText(creatURI(filename))
+	referenceCollector := NewReferenceCollector(expr, &locations, filename, content)
+	traverser := NewTraverser(referenceCollector)
+	traverser.TraverseStmts(stmts, scopeStack)
+
+	return locations
 }
