@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -120,18 +119,6 @@ func findReferencesInFile(expr *parser.Ident, filename string) []protocol.Locati
 
 	// 在解析后的文件中查找引用
 	return findReferencesInScopes(expr, parsedFile.Stmts, filename)
-}
-
-// parseFile 是一个辅助方法，用于封装文件的读取和解析
-func parseFile(filename string) (*parser.File, error) {
-	// 读取文件内容
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-
-	// 使用新的通用文件解析函数
-	return ParseFileContent(filename, string(content))
 }
 
 // findReferencesInScopes 在作用域中查找引用
