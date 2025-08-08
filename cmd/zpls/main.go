@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/diiyw/z/cmd/zpls/file"
 	"github.com/tliron/commonlog"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -35,11 +36,11 @@ func main() {
 			return nil
 		},
 		TextDocumentDidOpen: func(context *glsp.Context, params *protocol.DidOpenTextDocumentParams) error {
-			Document().Set(params.TextDocument.URI, params.TextDocument)
+			file.Document().Set(params.TextDocument.URI, params.TextDocument)
 			return nil
 		},
 		TextDocumentDidClose: func(context *glsp.Context, params *protocol.DidCloseTextDocumentParams) error {
-			Document().Delete(params.TextDocument.URI)
+			file.Document().Delete(params.TextDocument.URI)
 			return nil
 		},
 		TextDocumentDidChange: func(context *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
@@ -52,7 +53,7 @@ func main() {
 				Version:    params.TextDocument.Version,
 				Text:       text,
 			}
-			Document().Set(uri, doc)
+			file.Document().Set(uri, doc)
 			return onTextDocumentChange(context, params)
 		},
 		TextDocumentCompletion:         onCompletionFunc,

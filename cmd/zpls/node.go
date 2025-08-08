@@ -7,6 +7,14 @@ import (
 	"github.com/diiyw/z/parser"
 )
 
+// NodeFinder 实现TraverserHandler接口，用于查找指定偏移位置的节点
+type NodeFinder struct {
+	BaseTraverserHandler
+	offset int
+	parent parser.Expr
+	node   parser.Expr
+}
+
 // NewNodeFinder 创建一个新的NodeFinder
 func NewNodeFinder(offset int) *NodeFinder {
 	return &NodeFinder{

@@ -12,6 +12,8 @@ type TraverserHandler interface {
 	HandleForInStmt(*parser.ForInStmt, *scopeStack)
 	HandleIdent(*parser.Ident, *scopeStack)
 	HandleSelectorExpr(*parser.SelectorExpr, *scopeStack)
+	HandleImportExpr(*parser.ImportExpr, *scopeStack)
+	HandleExportStmt(*parser.ExportStmt, *scopeStack)
 }
 
 // Traverser 用于遍历AST
@@ -39,6 +41,12 @@ func (b *BaseTraverserHandler) HandleIdent(ident *parser.Ident, scope *scopeStac
 
 // HandleSelectorExpr 提供空实现
 func (b *BaseTraverserHandler) HandleSelectorExpr(expr *parser.SelectorExpr, scope *scopeStack) {}
+
+// HandleImportExpr 提供空实现
+func (b *BaseTraverserHandler) HandleImportExpr(expr *parser.ImportExpr, scope *scopeStack) {}
+
+// HandleExportStmt 提供空实现
+func (b *BaseTraverserHandler) HandleExportStmt(stmt *parser.ExportStmt, scope *scopeStack) {}
 
 // NewTraverser 创建一个新的Traverser
 func NewTraverser(handler TraverserHandler) *Traverser {
@@ -81,6 +89,8 @@ func (t *Traverser) TraverseStmt(stmt parser.Stmt, scope *scopeStack) {
 			}
 			// 弹出作用域
 			scope.popScope()
+		} else if importExpr, ok := s.Expr.(*parser.ImportExpr); ok {
+			t.handler.HandleImportExpr(importExpr, scope)
 		}
 	case *parser.ForInStmt:
 		t.handler.HandleForInStmt(s, scope)
@@ -105,6 +115,7 @@ func (t *Traverser) TraverseStmt(stmt parser.Stmt, scope *scopeStack) {
 	case *parser.ReturnStmt:
 		t.TraverseExpr(s.Result, scope)
 	case *parser.ExportStmt:
+		t.handler.HandleExportStmt(s, scope)
 		t.TraverseExpr(s.Result, scope)
 	}
 }
@@ -144,6 +155,8 @@ func (t *Traverser) TraverseExpr(expr parser.Expr, scope *scopeStack) {
 			t.TraverseStmts(e.Body.Stmts, scope)
 		}
 		scope.popScope()
+	case *parser.ImportExpr:
+		t.handler.HandleImportExpr(e, scope)
 	case *parser.IndexExpr:
 		t.TraverseExpr(e.Expr, scope)
 		t.TraverseExpr(e.Index, scope)

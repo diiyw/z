@@ -64,78 +64,112 @@ var (
 	constants = []string{"true", "false", "undefined"}
 )
 
-// VariableCollector 实现TraverserHandler接口，用于收集变量
-type VariableCollector struct {
+// CompletionCollector 实现TraverserHandler接口，用于收集变量
+type CompletionCollector struct {
 	BaseTraverserHandler
 	variables *[]string
 	varMap    map[string]bool
+	imports   map[string]string
+	filename  string
 }
 
-// NewVariableCollector 创建一个新的VariableCollector
-func NewVariableCollector(variables *[]string) *VariableCollector {
+// NewCompletionCollector 创建一个新的CompletionCollector
+func NewCompletionCollector(variables *[]string) *CompletionCollector {
 	// 使用map去重
 	varMap := make(map[string]bool)
 	for _, v := range *variables {
 		varMap[v] = true
 	}
 
-	return &VariableCollector{
+	return &CompletionCollector{
 		variables: variables,
 		varMap:    varMap,
+		imports:   make(map[string]string),
 	}
 }
 
-func (vc *VariableCollector) HandleAssignStmt(stmt *parser.AssignStmt, scope *scopeStack) {
+// SetFilename 设置当前处理的文件名
+func (c *CompletionCollector) SetFilename(filename string) {
+	c.filename = filename
+}
+
+// GetImports 获取收集到的导入模块
+func (c *CompletionCollector) GetImports() map[string]string {
+	return c.imports
+}
+
+func (c *CompletionCollector) HandleAssignStmt(stmt *parser.AssignStmt, scope *scopeStack) {
 	// 添加左侧的变量到当前作用域
 	for _, lh := range stmt.LHS {
 		if ident, ok := lh.(*parser.Ident); ok {
 			scope.addVariable(ident.Name)
 			// 如果变量还没有加入到列表中，则添加
-			if !vc.varMap[ident.Name] {
-				*vc.variables = append(*vc.variables, ident.Name)
-				vc.varMap[ident.Name] = true
+			if !c.varMap[ident.Name] {
+				*c.variables = append(*c.variables, ident.Name)
+				c.varMap[ident.Name] = true
 			}
 		}
 	}
 }
 
-func (vc *VariableCollector) HandleBlockStmt(stmt *parser.BlockStmt, scope *scopeStack) {
-	// 空实现
-}
-
-func (vc *VariableCollector) HandleFuncLit(stmt *parser.FuncLit, scope *scopeStack) {
+func (c *CompletionCollector) HandleFuncLit(stmt *parser.FuncLit, scope *scopeStack) {
 	// 添加参数到作用域
 	if stmt.Type.Params != nil {
 		for _, param := range stmt.Type.Params.List {
 			scope.addVariable(param.Name)
 			// 如果变量还没有加入到列表中，则添加
-			if !vc.varMap[param.Name] {
-				*vc.variables = append(*vc.variables, param.Name)
-				vc.varMap[param.Name] = true
+			if !c.varMap[param.Name] {
+				*c.variables = append(*c.variables, param.Name)
+				c.varMap[param.Name] = true
 			}
 		}
 	}
 }
 
-func (vc *VariableCollector) HandleForInStmt(stmt *parser.ForInStmt, scope *scopeStack) {
+func (c *CompletionCollector) HandleForInStmt(stmt *parser.ForInStmt, scope *scopeStack) {
 	// 添加key和value到作用域
 	scope.addVariable(stmt.Key.Name)
 	// 如果变量还没有加入到列表中，则添加
-	if !vc.varMap[stmt.Key.Name] {
-		*vc.variables = append(*vc.variables, stmt.Key.Name)
-		vc.varMap[stmt.Key.Name] = true
+	if !c.varMap[stmt.Key.Name] {
+		*c.variables = append(*c.variables, stmt.Key.Name)
+		c.varMap[stmt.Key.Name] = true
 	}
 
 	scope.addVariable(stmt.Value.Name)
 	// 如果变量还没有加入到列表中，则添加
-	if !vc.varMap[stmt.Value.Name] {
-		*vc.variables = append(*vc.variables, stmt.Value.Name)
-		vc.varMap[stmt.Value.Name] = true
+	if !c.varMap[stmt.Value.Name] {
+		*c.variables = append(*c.variables, stmt.Value.Name)
+		c.varMap[stmt.Value.Name] = true
 	}
 }
 
-func (vc *VariableCollector) HandleIdent(ident *parser.Ident, scope *scopeStack) {
-	// 空实现
+// HandleImportExpr 处理import语句，收集导入的模块
+func (c *CompletionCollector) HandleImportExpr(expr *parser.ImportExpr, scope *scopeStack) {
+	// 处理import语句，收集导入的模块
+	if c.filename != "" {
+		currentDir := filepath.Dir(c.filename)
+		moduleName := expr.ModuleName
+		modulePath := filepath.Join(currentDir, moduleName+".z")
+		if _, err := os.Stat(modulePath); err == nil {
+			c.imports[moduleName] = modulePath
+		}
+	}
+}
+
+// HandleExportStmt 处理export语句，收集导出的变量
+func (c *CompletionCollector) HandleExportStmt(stmt *parser.ExportStmt, scope *scopeStack) {
+	if m, ok := stmt.Result.(*parser.MapLit); ok {
+		// 解析MapLit中的所有元素
+		for _, element := range m.Elements {
+			if ident, ok := element.Key.(*parser.Ident); ok {
+				// 如果变量还没有加入到列表中，则添加
+				if !c.varMap[ident.Name] {
+					*c.variables = append(*c.variables, ident.Name)
+					c.varMap[ident.Name] = true
+				}
+			}
+		}
+	}
 }
 
 func onCompletionFunc(context *glsp.Context, params *protocol.CompletionParams) (any, error) {
@@ -173,8 +207,30 @@ func onCompletionFunc(context *glsp.Context, params *protocol.CompletionParams) 
 	// 添加模块和模块内变量的补全
 	filename := strings.ReplaceAll(params.TextDocument.URI, "file://", "")
 
-	// 查找当前文件中的import语句
-	importedModules := findImportedModules(filename)
+	// 查找当前文件中的变量并添加到补全项
+	var variables []string
+	// 使用新的遍历器收集所有变量和导入语句
+	scopeStack := newScopeStack()
+	collector := NewCompletionCollector(&variables)
+	collector.SetFilename(filename)
+
+	// 读取文件内容
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		return items, nil
+	}
+
+	// 使用新的通用文件解析函数
+	parsedFile, err := ParseFileContent(filename, string(content))
+	if err != nil {
+		return items, nil
+	}
+
+	traverser := NewTraverser(collector)
+	traverser.TraverseStmts(parsedFile.Stmts, scopeStack)
+
+	// 获取导入的模块
+	importedModules := collector.GetImports()
 	for moduleName, modulePath := range importedModules {
 		// 添加模块名作为补全项
 		moduleKind := protocol.CompletionItemKindModule
@@ -200,8 +256,6 @@ func onCompletionFunc(context *glsp.Context, params *protocol.CompletionParams) 
 		}
 	}
 
-	// 查找当前文件中的变量并添加到补全项
-	variables := findLocalVariables(filename)
 	varKind := protocol.CompletionItemKindVariable
 	for _, variable := range variables {
 		items = append(items, protocol.CompletionItem{
@@ -212,39 +266,6 @@ func onCompletionFunc(context *glsp.Context, params *protocol.CompletionParams) 
 	}
 
 	return items, nil
-}
-
-// findImportedModules 查找文件中导入的模块
-func findImportedModules(filename string) map[string]string {
-	imports := make(map[string]string)
-
-	// 读取文件内容
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		return imports
-	}
-
-	// 使用新的通用文件解析函数
-	parsedFile, err := ParseFileContent(filename, string(content))
-	if err != nil {
-		return imports
-	}
-
-	// 遍历语法树查找import语句
-	currentDir := filepath.Dir(filename)
-	for _, stmt := range parsedFile.Stmts {
-		if exprStmt, ok := stmt.(*parser.ExprStmt); ok {
-			if importExpr, ok := exprStmt.Expr.(*parser.ImportExpr); ok {
-				moduleName := importExpr.ModuleName
-				modulePath := filepath.Join(currentDir, moduleName+".z")
-				if _, err := os.Stat(modulePath); err == nil {
-					imports[moduleName] = modulePath
-				}
-			}
-		}
-	}
-
-	return imports
 }
 
 // findExportedVariables 查找模块中导出的变量
@@ -263,44 +284,9 @@ func findExportedVariables(modulePath string) []string {
 		return variables
 	}
 
-	// 遍历语法树查找export语句
-	for _, stmt := range parsedFile.Stmts {
-		if exportStmt, ok := stmt.(*parser.ExportStmt); ok {
-			if m, ok := exportStmt.Result.(*parser.MapLit); ok {
-				// 解析MapLit中的所有元素
-				for _, element := range m.Elements {
-					if ident, ok := element.Key.(*parser.Ident); ok {
-						variables = append(variables, ident.Name)
-					}
-				}
-			}
-		}
-	}
-
-	return variables
-}
-
-// findLocalVariables 查找文件中的本地变量
-func findLocalVariables(filename string) []string {
-	var variables []string
-
-	// 读取文件内容
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		return variables
-	}
-
-	// 使用新的通用文件解析函数
-	parsedFile, err := ParseFileContent(filename, string(content))
-	if err != nil {
-		return variables
-	}
-
-	// 创建一个作用域栈来追踪变量定义
+	// 使用CompletionCollector收集导出的变量
+	collector := NewCompletionCollector(&variables)
 	scopeStack := newScopeStack()
-
-	// 使用新的遍历器收集所有变量
-	collector := NewVariableCollector(&variables)
 	traverser := NewTraverser(collector)
 	traverser.TraverseStmts(parsedFile.Stmts, scopeStack)
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"github.com/diiyw/z/cmd/zpls/file"
 	"strings"
 
 	"github.com/diiyw/z/parser"
@@ -15,7 +16,7 @@ func onTextDocumentChange(context *glsp.Context, params *protocol.DidChangeTextD
 
 func onDiagnostic(context *glsp.Context, uri string) error {
 	filename := strings.ReplaceAll(uri, "file://", "")
-	content := Document().GetText(uri)
+	content := file.Document().GetText(uri)
 
 	// 使用新的通用文件解析函数
 	_, err := ParseFileContent(filename, content)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/diiyw/z/cmd/zpls/file"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -64,7 +65,7 @@ func fullFileRange(content string) protocol.Range {
 // getTextFromVersion 从文档URI和内容变更中提取完整的文档文本
 func getTextFromVersion(uri string, changes []any) string {
 	// 获取当前文档
-	doc, ok := Document().Get(uri)
+	doc, ok := file.Document().Get(uri)
 
 	// 如果文档不存在，则从变更中获取文本
 	if !ok {
